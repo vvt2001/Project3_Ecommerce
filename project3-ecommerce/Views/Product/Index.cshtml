@@ -16,6 +16,7 @@
         text-overflow: ellipsis;
         white-space: nowrap;
     }
+
     .card-body {
         border: solid 1px;
         border-color: lightgray;
@@ -23,6 +24,7 @@
         text-overflow: ellipsis;
         overflow: hidden;
     }
+
     .card-footer {
         background-color: whitesmoke;
         padding: 0.5em 0.5em 0.5em 1em;
@@ -34,14 +36,15 @@
         border-bottom-right-radius: 4px;
         margin-bottom: 20px
     }
-    .text-muted{
-        overflow:hidden;
-        text-overflow:ellipsis;
-        white-space:nowrap;
+
+    .text-muted {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 </style>
 
-<h2> Sản phẩm </h2> 
+<h2> Sản phẩm </h2>
 <div class="container" style="margin:10px 0 10px 0">
     @foreach (var product in Model)
     {
@@ -58,3 +61,7 @@
     }
 
 </div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
