@@ -14,6 +14,7 @@
           <Property Name="Description" Type="nvarchar(max)" />
           <Property Name="Image" Type="image" />
           <Property Name="Price" Type="bigint" Nullable="false" />
+          <Property Name="Category" Type="nvarchar(max)" Nullable="false" />
         </EntityType>
         <EntityContainer Name="ProductModelStoreContainer">
           <EntitySet Name="Product" EntityType="Self.Product" Schema="dbo" store:Type="Tables" />
@@ -31,6 +32,7 @@
           <Property Name="Description" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="Image" Type="Binary" MaxLength="Max" FixedLength="false" />
           <Property Name="Price" Type="Int64" Nullable="false" />
+          <Property Name="Category" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityContainer Name="ProductEntities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="Products" EntityType="Self.Product" />
@@ -44,6 +46,7 @@
           <EntitySetMapping Name="Products">
             <EntityTypeMapping TypeName="ProductModel.Product">
               <MappingFragment StoreEntitySet="Product">
+                <ScalarProperty Name="Category" ColumnName="Category" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
                 <ScalarProperty Name="Name" ColumnName="Name" />
                 <ScalarProperty Name="Description" ColumnName="Description" />

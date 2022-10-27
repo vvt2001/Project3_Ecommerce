@@ -19,5 +19,7 @@ namespace project3_ecommerce.Models
         public string Description { get; set; }
         public byte[] Image { get; set; }
         public long Price { get; set; }
+        public string Category { get; set; }
+        public Category Category_EnumValue { get; set; }
     }
 }

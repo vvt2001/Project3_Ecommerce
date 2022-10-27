@@ -1,0 +1,112 @@
+﻿@model List<project3_ecommerce.Models.CartItem>
+
+@{
+    ViewBag.Title = "Giỏ hàng của tôi";
+    if (Session["ID"] == null)
+    {
+        Response.Redirect("~/Account");
+    }
+}
+
+<h2>Giỏ hàng của tôi</h2>
+<div id="cart">
+
+
+    @if (Model != null && Model.Count > 0)
+    {
+        decimal total = 0;
+        int stt = 1;
+
+        <table class="table table-striped table-bordered">
+            <tr>
+                <th>#</th>
+                <th>Sản phẩm</th>
+                <th>Giá</th>
+                <th>Số lượng</th>
+                <th>Thành tiền</th>
+                <th></th>
+            </tr>
+            @foreach (var cartitem in Model)
+            {
+                var thanhtien = cartitem.Quantity * cartitem.Product.Price;
+                total += thanhtien;
+
+                <tr>
+
+                    <td>@(stt++)</td>
+                    <td>@cartitem.Product.Name</td>
+                    <td>@(cartitem.Product.Price.ToString("n0"))</td>
+                    <td><input asp-for="@cartitem.Quantity" id="@($"Quantity-{cartitem.Product.ID}")" value="@cartitem.Quantity" onkeypress="return isNumber(event)" onchange="UpdateCart(@cartitem.Product.ID)" /></td>
+                    <td>@(thanhtien.ToString("n0"))</td>
+                    <td>
+                        @*                        <input type="button" value="Cập nhật" class="btn btn-success" onclick="UpdateQuantity(@cartitem.Product.ID)">*@
+                        <input type="button" value="Xóa" class="btn btn-danger" onclick="DeleteCartItem(@cartitem.Product.ID)">
+                    </td>
+
+                </tr>
+            }
+            <tr>
+                <td colspan="4" class="text-right">Tổng tiền</td>
+                <td>@(total.ToString("n0"))</td>
+                <td></td>
+            </tr>
+        </table>
+
+        @Html.ActionLink("Gửi đơn hàng", "CartCheck", "Product", new { @class = "btn btn-success" })
+
+    }
+    else
+    {
+        <p class="alert alert-danger">Giỏ hàng trống</p>
+    }
+</div>
+@section Scripts {
+    <script>
+        var IDCount = @Html.Raw(Json.Encode(@ViewBag.IDCount));
+        var CartItemsId = @Html.Raw(Json.Encode(@ViewBag.CartItemsId));
+
+
+        function UpdateCart(ID) {
+            var Quantity = $("#Quantity-" + ID).val();
+            $.ajax({
+                url: '@Url.Action("UpdateCart")',
+                type: 'POST',
+                data: jQuery.param({ ID: ID, Quantity: Quantity }),
+                success: function () {
+                    $("#cart").load(" #cart");
+                },
+                error: function () {
+                    alert("Có lỗi trong việc cật nhật số lượng.");
+                },
+            });
+            return false;
+        }
+
+        function DeleteCartItem(ID) {
+            $.ajax({
+                url: '@Url.Action("DeleteCartItem")',
+                type: 'POST',
+                data: jQuery.param({ ID: ID}),
+                success: function () {
+                    IDCount--;
+                    const index = CartItemsId.indexOf(ID);
+                    CartItemsId.splice(index, 1);
+                    $("#cart").load(" #cart");
+
+                },
+                error: function () {
+                    alert("Có lỗi trong việc xóa sản phẩm.");
+                },
+            });
+            return false;
+        }
+        function isNumber(evt) {
+            evt = (evt) ? evt : window.event;
+            var charCode = (evt.which) ? evt.which : evt.keyCode;
+            if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+                return false;
+            }
+            return true;
+        }
+    </script>
+}

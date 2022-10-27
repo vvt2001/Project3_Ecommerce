@@ -13,7 +13,7 @@ namespace project3_ecommerce.Models
     using System.ComponentModel.DataAnnotations;
     public partial class Account
     {
-        public int ID { get; set; }
+        public long ID { get; set; }
         [Required(ErrorMessage = "Bắt buộc.")]
         [DisplayName("Tài khoản")]
         public string Username { get; set; }
@@ -23,11 +23,12 @@ namespace project3_ecommerce.Models
         public string Password { get; set; }
         public byte[] HashedPassword { get; set; }
         public byte[] Key { get; set; }
-        [Required(ErrorMessage = "Bắt buộc.")]
         [DataType(DataType.Password)]
         [DisplayName("Xác nhận lại mật khẩu")]
         public string confirmPassword { get; set; }
         public string registerErrorMessage { get; set; }
         public string loginErrorMessage { get; set; }
+        public string CartInfo { get; set; }
+
     }
 }

@@ -125,8 +125,9 @@ namespace project3_ecommerce.Controllers
                 {
                     Session["ID"] = accountDetail.ID;
                     Session["Username"] = accountDetail.Username;
+                    Session["Cart"] = accountDetail.CartInfo;
                     HttpCookie Usercookie = new HttpCookie("ID", Session["ID"].ToString());
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Index", "Product");
                 }
                 else
                 {
@@ -139,7 +140,7 @@ namespace project3_ecommerce.Controllers
         public ActionResult Logout()
         {
             Session.Abandon();
-            return RedirectToAction("Index", "Accounts");
+            return RedirectToAction("Index", "Account");
         }
 
         public ActionResult ChangePassword(int? id)

@@ -1,4 +1,6 @@
-﻿@model List<project3_ecommerce.Models.Product>
+﻿@model IPagedList<project3_ecommerce.Models.Product>
+@using PagedList.Mvc;
+@using PagedList;
 @{
     ViewData["Title"] = "Các sản phẩm";
 }
@@ -42,6 +44,7 @@
         text-overflow: ellipsis;
         white-space: nowrap;
     }
+
 </style>
 
 <h2> Sản phẩm </h2>
@@ -55,13 +58,40 @@
             </div>
             <div class="card-footer">
                 <div class="text-muted">@(product.Price.ToString("n0")) VND</div>
-                <a class="btn btn-sm" href="#" style="float:right;background-color:black;color:white;margin:3px 3px 3px 3px">Đặt hàng</a>
+                <input type="button" value="Đặt hàng" class="btn btn-sm" style="float:right;background-color:black;color:white;margin:3px 3px 3px 3px" onclick="AddToCart(@product.ID)">
             </div>
         </div>
     }
+
+    @Html.PagedListPager(Model, page => Url.Action("Index", "Product", new { page }),
+        new PagedListRenderOptions
+        {
+            MaximumPageNumbersToDisplay = 5,
+        })
 
 </div>
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
+    <script>
+    function AddToCart(ID) {
+        $.ajax({
+            url: '@Url.Action("AddToCart")',
+            type: 'POST',
+            data: jQuery.param({ ID: ID }),
+            success: function (data) {
+                var jsonData = JSON.parse(data);
+                if (jsonData.Message == "SUCCESS")
+                    alert("Đã thêm sản phẩm vào giỏ hàng, xin kiểm tra.");
+                else {
+                    Response.Redirect("~/Account");
+                }
+            },
+            error: function () {
+                alert("Có lỗi trong việc thêm sản phẩm vào giỏ hàng.");
+            },
+        });
+        return false;
+    }
+    </script>
 }
