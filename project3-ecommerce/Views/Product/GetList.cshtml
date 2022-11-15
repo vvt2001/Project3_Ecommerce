@@ -1,0 +1,196 @@
+﻿@model project3_ecommerce.Models.SearchViewModel
+@using PagedList.Mvc;
+
+@{
+    ViewBag.Title = "Danh sách sản phẩm";
+}
+
+<style>
+    th {
+        text-align: center;
+        padding: 0.5em 0.5em 0.5em 0.5em;
+        white-space: nowrap;
+    }
+
+    td {
+        padding: 0.5em 0.5em 0.5em 0.5em;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .form-control {
+        margin: 0px 10px 10px 0px;
+        width: 200px;
+    }
+
+    .table {
+        width: 100%;
+    }
+
+</style>
+@using (Html.BeginForm("GetList", "Product", FormMethod.Post))
+{
+    <div style=" margin: auto ">
+        <h3>Bộ lọc tìm kiếm</h3>
+        <div class="container">
+            <div class="row">
+                @Html.EditorFor(model => model.SearchModel.Name, new { htmlAttributes = new { Class = "form-control col-md-3", @placeholder = "Tên sản phẩm", style = "width: 260px" } })
+
+                @Html.DropDownListFor(model => model.SearchModel.Category, ViewBag.Category_EnumList as SelectList, "-Danh mục sản phẩm-", new { Class = "form-control col-md-3" })
+            </div>
+            <div class="row">
+                @Html.EditorFor(model => model.SearchModel.LowerPrice, new { htmlAttributes = new { Class = "form-control col-md-3", @placeholder = "Từ", onkeypress = "return isNumber(event)" } })
+                
+                @Html.EditorFor(model => model.SearchModel.UpperPrice, new { htmlAttributes = new { Class = "form-control col-md-3", @placeholder = "Đến", onkeypress = "return isNumber(event)" } })
+
+                <input type="submit" value="Tìm" class="btn btn-secondary col-md-2" style="margin:auto; display:block; width:50px" />
+            </div>
+        </div>
+    </div>
+}
+
+<h3>Danh sách sản phẩm trong kho</h3>
+<table class="table table-bordered table-striped">
+    @if (Model.ProductModel != null)
+    {
+        if (Model.ProductModel.Count() != 0)
+        {
+            <tr>
+                <th>
+                    STT
+                </th>
+                <th>
+                    Tên sản phẩm
+                </th>
+                <th>
+                    Danh mục
+                </th>
+                <th>
+                    Mô tả
+                </th>
+                <th>
+                    Giá (VND)
+                </th>
+                <th></th>
+            </tr>
+
+            int i = 1;
+            foreach (var item in Model.ProductModel)
+            {
+                <tr>
+                    <td style="text-align:center;max-width:100px">
+                        @(i++)
+                    </td>
+
+                    <td style="text-align:center;max-width:150px">
+                        @Html.ActionLink(item.Name, "Details", "Product", new { id = item.ID }, null) <br />
+
+                    </td>
+
+                    <td style="text-align:center">
+                        @item.Category
+                    </td>
+
+                    <td style="max-width:700px">
+                        @item.Description
+                    </td>
+
+                    <td>
+                        @item.Price
+                    </td>
+
+                    <td style="text-align:center">
+
+                        <input type="button" value="Xóa" class="btn btn-danger" id="del-btn" confirm="Chắc chắn xóa sản phẩm khỏi kho?" onclick="Delete(@item.ID)">
+                    </td>
+                </tr>
+            }
+        }
+    }
+</table>
+@if (Model.ProductModel != null)
+{
+    if (Model.ProductModel.Count() == 0)
+    {
+        <div style="padding: 1em 1em 1em 1em; background-color:whitesmoke">
+            Không tìm thấy dữ liệu
+        </div>
+    }
+}
+@if (Model.ProductModel == null)
+{
+    <div style="padding: 1em 1em 1em 1em; background-color:whitesmoke">
+        Không tìm thấy dữ liệu
+    </div>
+}
+
+
+
+@if (Model.ProductModel != null)
+{
+    if (Model.ProductModel.Count() != 0)
+    {
+        <br />
+        @Html.PagedListPager(Model.ProductModel, page => Url.Action("GetList",
+            new { page, sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter }))
+    }
+
+}
+
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+<script>
+        function isNumber(evt) {
+            evt = (evt) ? evt : window.event;
+            var charCode = (evt.which) ? evt.which : evt.keyCode;
+            if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+                return false;
+            }
+            return true;
+        }
+
+        $("#del-btn").confirm({
+            title: "Delete confirmation",
+            text: "This is very dangerous, you shouldn't do it! Are you really really sure?",
+            confirm: function (button) {
+                console.log('AJAX request in progress...');
+
+                $.ajax({
+                    url: '@Url.Action("Delete")',
+                    type: 'POST',
+                    data: jQuery.param({ ID: ID}),
+                    success: function () {
+                        window.location.reload();
+                    },
+                    error: function () {
+                        alert("Có lỗi trong việc xóa sản phẩm.");
+                    },
+                });
+                return false;
+            },
+            cancel: function (button) {
+                console.log("You aborted the operation.");
+            },
+            confirmButton: "Yes I am",
+            cancelButton: "No"
+        });
+
+
+        function Delete(ID) {
+            $.ajax({
+                url: '@Url.Action("Delete")',
+                type: 'POST',
+                data: jQuery.param({ ID: ID}),
+                success: function () {
+                    window.location.reload();
+                },
+                error: function () {
+                    alert("Có lỗi trong việc xóa sản phẩm.");
+                },
+            });
+            return false;
+        }
+</script>
+}

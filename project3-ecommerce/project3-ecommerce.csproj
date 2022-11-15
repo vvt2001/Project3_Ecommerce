@@ -159,6 +159,7 @@
       <DependentUpon>AccountModel.edmx</DependentUpon>
     </Compile>
     <Compile Include="Models\CartItemModel.cs" />
+    <Compile Include="Models\EnumExtension.cs" />
     <Compile Include="Models\Product.cs">
       <DependentUpon>ProductModel.tt</DependentUpon>
     </Compile>
@@ -177,6 +178,26 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>ProductModel.edmx</DependentUpon>
     </Compile>
+    <Compile Include="Models\Sale.cs">
+      <DependentUpon>SalesModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\SalesModel.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SalesModel.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\SalesModel.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SalesModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\SalesModel.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SalesModel.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Models\SearchModel.cs" />
+    <Compile Include="Models\SearchViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -185,6 +206,8 @@
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\PagedList.css" />
+    <Content Include="Content\toastr.css" />
+    <Content Include="Content\toastr.min.css" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
@@ -209,6 +232,16 @@
       <DependentUpon>ProductModel.edmx</DependentUpon>
       <LastGenOutput>ProductModel.cs</LastGenOutput>
     </Content>
+    <Content Include="Models\SalesModel.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>SalesModel.edmx</DependentUpon>
+      <LastGenOutput>SalesModel.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="Models\SalesModel.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>SalesModel.edmx</DependentUpon>
+      <LastGenOutput>SalesModel.cs</LastGenOutput>
+    </Content>
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <EntityDeploy Include="Models\ProductModel.edmx">
@@ -225,6 +258,15 @@
     <Content Include="Models\AccountModel.edmx.diagram">
       <DependentUpon>AccountModel.edmx</DependentUpon>
     </Content>
+    <Content Include="Content\toastr.scss" />
+    <Content Include="Content\toastr.less" />
+    <EntityDeploy Include="Models\SalesModel.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>SalesModel.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <Content Include="Models\SalesModel.edmx.diagram">
+      <DependentUpon>SalesModel.edmx</DependentUpon>
+    </Content>
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.4.1.js" />
     <Content Include="Scripts\jquery-3.4.1.min.js" />
@@ -236,6 +278,8 @@
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
+    <Content Include="Scripts\toastr.js" />
+    <Content Include="Scripts\toastr.min.js" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -261,6 +305,7 @@
     <Content Include="Views\Product\Cart.cshtml" />
     <Content Include="Views\Product\CartCheck.cshtml" />
     <Content Include="Views\Product\ConfirmPurchase.cshtml" />
+    <Content Include="Views\Product\GetList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

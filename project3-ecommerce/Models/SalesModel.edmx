@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="SalesModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Sales">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="bigint" Nullable="false" />
+          <Property Name="Tháng" Type="date" Nullable="false" />
+          <Property Name="Doanh thu Máy tính" Type="bigint" Nullable="false" />
+          <Property Name="Doanh thu Điện thoại" Type="bigint" Nullable="false" />
+          <Property Name="Doanh thu Phụ kiện" Type="bigint" Nullable="false" />
+          <Property Name="Doanh thu Khác" Type="bigint" Nullable="false" />
+          <Property Name="Số sản phẩm bán được Máy tính" Type="bigint" Nullable="false" />
+          <Property Name="Số sản phẩm bán được Điện thoại" Type="bigint" Nullable="false" />
+          <Property Name="Số sản phẩm bán được Phụ kiện" Type="bigint" Nullable="false" />
+          <Property Name="Số sản phẩm bán được Khác" Type="bigint" Nullable="false" />
+          <Property Name="Số sản phẩm còn lại Máy tính" Type="bigint" Nullable="false" />
+          <Property Name="Số sản phẩm còn lại Điện thoại" Type="bigint" Nullable="false" />
+          <Property Name="Số sản phẩm còn lại Phụ kiện" Type="bigint" Nullable="false" />
+          <Property Name="Số sản phẩm còn lại Khác" Type="bigint" Nullable="false" />
+        </EntityType>
+        <EntityContainer Name="SalesModelStoreContainer">
+          <EntitySet Name="Sales" EntityType="Self.Sales" Schema="dbo" store:Type="Tables" />
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="SalesModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Sale">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int64" Nullable="false" />
+          <Property Name="Tháng" Type="DateTime" Precision="0" Nullable="false" />
+          <Property Name="Doanh_thu_Máy_tính" Type="Int64" Nullable="false" />
+          <Property Name="Doanh_thu_Điện_thoại" Type="Int64" Nullable="false" />
+          <Property Name="Doanh_thu_Phụ_kiện" Type="Int64" Nullable="false" />
+          <Property Name="Doanh_thu_Khác" Type="Int64" Nullable="false" />
+          <Property Name="Số_sản_phẩm_bán_được_Máy_tính" Type="Int64" Nullable="false" />
+          <Property Name="Số_sản_phẩm_bán_được_Điện_thoại" Type="Int64" Nullable="false" />
+          <Property Name="Số_sản_phẩm_bán_được_Phụ_kiện" Type="Int64" Nullable="false" />
+          <Property Name="Số_sản_phẩm_bán_được_Khác" Type="Int64" Nullable="false" />
+          <Property Name="Số_sản_phẩm_còn_lại_Máy_tính" Type="Int64" Nullable="false" />
+          <Property Name="Số_sản_phẩm_còn_lại_Điện_thoại" Type="Int64" Nullable="false" />
+          <Property Name="Số_sản_phẩm_còn_lại_Phụ_kiện" Type="Int64" Nullable="false" />
+          <Property Name="Số_sản_phẩm_còn_lại_Khác" Type="Int64" Nullable="false" />
+        </EntityType>
+        <EntityContainer Name="SalesEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Sales" EntityType="Self.Sale" />
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="SalesModelStoreContainer" CdmEntityContainer="SalesEntities">
+          <EntitySetMapping Name="Sales">
+            <EntityTypeMapping TypeName="SalesModel.Sale">
+              <MappingFragment StoreEntitySet="Sales">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="Tháng" ColumnName="Tháng" />
+                <ScalarProperty Name="Doanh_thu_Máy_tính" ColumnName="Doanh thu Máy tính" />
+                <ScalarProperty Name="Doanh_thu_Điện_thoại" ColumnName="Doanh thu Điện thoại" />
+                <ScalarProperty Name="Doanh_thu_Phụ_kiện" ColumnName="Doanh thu Phụ kiện" />
+                <ScalarProperty Name="Doanh_thu_Khác" ColumnName="Doanh thu Khác" />
+                <ScalarProperty Name="Số_sản_phẩm_bán_được_Máy_tính" ColumnName="Số sản phẩm bán được Máy tính" />
+                <ScalarProperty Name="Số_sản_phẩm_bán_được_Điện_thoại" ColumnName="Số sản phẩm bán được Điện thoại" />
+                <ScalarProperty Name="Số_sản_phẩm_bán_được_Phụ_kiện" ColumnName="Số sản phẩm bán được Phụ kiện" />
+                <ScalarProperty Name="Số_sản_phẩm_bán_được_Khác" ColumnName="Số sản phẩm bán được Khác" />
+                <ScalarProperty Name="Số_sản_phẩm_còn_lại_Máy_tính" ColumnName="Số sản phẩm còn lại Máy tính" />
+                <ScalarProperty Name="Số_sản_phẩm_còn_lại_Điện_thoại" ColumnName="Số sản phẩm còn lại Điện thoại" />
+                <ScalarProperty Name="Số_sản_phẩm_còn_lại_Phụ_kiện" ColumnName="Số sản phẩm còn lại Phụ kiện" />
+                <ScalarProperty Name="Số_sản_phẩm_còn_lại_Khác" ColumnName="Số sản phẩm còn lại Khác" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

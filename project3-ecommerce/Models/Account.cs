@@ -29,6 +29,8 @@ namespace project3_ecommerce.Models
         public string registerErrorMessage { get; set; }
         public string loginErrorMessage { get; set; }
         public string CartInfo { get; set; }
+        public int Admin { get; set; }
+
 
     }
 }

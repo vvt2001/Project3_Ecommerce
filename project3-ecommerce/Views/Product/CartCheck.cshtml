@@ -42,7 +42,7 @@
             <td>@(total.ToString("n0"))</td>
         </tr>
     </table>
-
+    <div class="text-danger" style="margin-bottom:5px">@ViewBag.OutOfStocks</div>
     @Html.ActionLink("Xác nhận", "ConfirmPurchase", "Product", new { @class = "btn btn-success", @style = "margin-right: 10px"})
     @Html.ActionLink("Quay lại", "Cart", "Product", new { @class = "btn btn-danger" })
 

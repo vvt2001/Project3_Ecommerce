@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewBag.Title - XShop</title>
     @Styles.Render("~/Content/css")
+    <link href="~/Content/toastr.css" rel="stylesheet" />
     @Scripts.Render("~/bundles/modernizr")
     <style>
         /* Dropdown content (hidden by default) */
@@ -62,6 +63,17 @@
                 <ul class="nav navbar-nav">
                     @if (Session["ID"] != null)
                     {
+                        if (Session["Admin"].ToString() == "1")
+                        {
+                            <li class="dropdown">
+                                <a href="#">Quản trị</a>
+                                <div class="dropdown-content" style="width:200px">
+                                    @Html.ActionLink("Thêm sản phẩm mới", "Create", "Product")
+                                    @Html.ActionLink("Danh sách sản phẩm", "GetList", "Product")
+                                </div>
+                            </li>
+                        }
+                        <li>@Html.ActionLink("Giỏ hàng", "Cart", "Product")</li>
                         <li class="dropdown">
                             <a href="#">Welcome, @HttpContext.Current.Session["Username"].ToString()</a>
                             <div class="dropdown-content" style="width:200px">
@@ -83,7 +95,7 @@
     <div class="container body-content" style="min-height: 90vh">
         @RenderBody()
     </div>
-    
+
     <div class="container body-content" style="width: 85%; margin-top: auto;">
         <hr />
         <footer>
@@ -91,8 +103,10 @@
         </footer>
     </div>
 
+
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
+    <script src="~/Scripts/toastr.js"></script>
     @RenderSection("scripts", required: false)
 </body>
 </html>

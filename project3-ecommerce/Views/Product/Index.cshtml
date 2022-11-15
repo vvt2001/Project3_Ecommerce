@@ -1,4 +1,4 @@
-﻿@model IPagedList<project3_ecommerce.Models.Product>
+﻿@model project3_ecommerce.Models.SearchViewModel
 @using PagedList.Mvc;
 @using PagedList;
 @{
@@ -17,14 +17,14 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+        cursor: pointer
     }
 
     .card-body {
         border: solid 1px;
         border-color: lightgray;
-        padding: 0.5em 1em 0.5em 1em;
-        text-overflow: ellipsis;
         overflow: hidden;
+        cursor: pointer
     }
 
     .card-footer {
@@ -45,53 +45,92 @@
         white-space: nowrap;
     }
 
+    .form-control {
+        margin: 0px 10px 10px 0px;
+        width: 200px;
+    }
 </style>
 
-<h2> Sản phẩm </h2>
-<div class="container" style="margin:10px 0 10px 0">
-    @foreach (var product in Model)
-    {
-        <div class="card col-md-3">
-            <h3 class="card-header">@product.Name</h3>
-            <div class="card-body" style="height: 150px;">
-                @product.Description
+@using (Html.BeginForm("Index", "Product", FormMethod.Post))
+{
+    <div id="search-bar" style=" margin: auto ">
+        <h3>Bộ lọc tìm kiếm</h3>
+        <div class="container">
+            <div class="row">
+                @Html.EditorFor(model => model.SearchModel.Name, new { htmlAttributes = new { Class = "form-control col-md-3", @placeholder = "Tên sản phẩm", style = "width: 260px" } })
+
+                @Html.DropDownListFor(model => model.SearchModel.Category, ViewBag.Category_EnumList as SelectList, "-Danh mục sản phẩm-", new { Class = "form-control col-md-3" })
             </div>
-            <div class="card-footer">
-                <div class="text-muted">@(product.Price.ToString("n0")) VND</div>
-                <input type="button" value="Đặt hàng" class="btn btn-sm" style="float:right;background-color:black;color:white;margin:3px 3px 3px 3px" onclick="AddToCart(@product.ID)">
+            <div class="row">
+                @Html.EditorFor(model => model.SearchModel.LowerPrice, new { htmlAttributes = new { Class = "form-control col-md-3", @placeholder = "Từ", onkeypress = "return isNumber(event)" } })
+
+
+                @Html.EditorFor(model => model.SearchModel.UpperPrice, new { htmlAttributes = new { Class = "form-control col-md-3", @placeholder = "Đến", onkeypress = "return isNumber(event)" } })
+
+                <input type="submit" value="Tìm" class="btn btn-secondary col-md-2" style="margin:auto; display:block; width:50px" />
             </div>
         </div>
+    </div>
+}
+<hr />
+<h3> Danh sách sản phẩm </h3>
+<div class="container" style="margin:10px 0 10px 0">
+    @if (Model.ProductModel != null)
+    {
+        foreach (var product in Model.ProductModel)
+        {
+            <div class="card col-md-3" style="width: 280px;" >
+                <h3 class="card-header" onclick="redirect(@product.ID)">@product.Name</h3>
+                <div class="card-body" style="height:250px" onclick="redirect(@product.ID)">
+                    @if (product.ImagePath != null)
+                    {
+                        <img alt="" src="@product.ImagePath" style=" width: 100%; height: 100%;" />
+                    }
+                </div>
+                <div class="card-footer">
+                    <div class="text-muted">@(product.Price.ToString("n0")) VND</div>
+                    <input type="button" value="Đặt hàng" class="btn btn-sm" style="float:right;background-color:black;color:white;margin:3px 3px 3px 3px" onclick="AddToCart(@product.ID)">
+                </div>
+            </div>
+        }
     }
 
-    @Html.PagedListPager(Model, page => Url.Action("Index", "Product", new { page }),
-        new PagedListRenderOptions
-        {
-            MaximumPageNumbersToDisplay = 5,
-        })
+
+
 
 </div>
+<div>
+    @if (Model.ProductModel != null)
+    {
 
+        @Html.PagedListPager(Model.ProductModel, page => Url.Action("Index", "Product", new { page }),
+                 new PagedListRenderOptions
+                 {
+                     MaximumPageNumbersToDisplay = 5,
+                 })
+    }
+</div>
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
-    <script>
+<script>
     function AddToCart(ID) {
         $.ajax({
             url: '@Url.Action("AddToCart")',
             type: 'POST',
-            data: jQuery.param({ ID: ID }),
-            success: function (data) {
-                var jsonData = JSON.parse(data);
-                if (jsonData.Message == "SUCCESS")
-                    alert("Đã thêm sản phẩm vào giỏ hàng, xin kiểm tra.");
-                else {
-                    Response.Redirect("~/Account");
-                }
+            data: jQuery.param({ ID: ID, quantity: 1 }),
+            success: function () {
+                toastr.success("Đã thêm sản phẩm vào giỏ hàng, xin kiểm tra.","Thông báo");
             },
             error: function () {
-                alert("Có lỗi trong việc thêm sản phẩm vào giỏ hàng.");
+                toastr.error("Có lỗi trong việc thêm sản phẩm vào giỏ hàng.","Lỗi!");
             },
         });
         return false;
     }
-    </script>
+
+    function redirect(ID) {
+        var url = '@Url.Action("Details", "Product", new { id = "__id__" })';
+        window.location.href = url.replace('__id__', ID);
+    }
+</script>
 }

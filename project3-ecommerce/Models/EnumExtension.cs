@@ -45,5 +45,7 @@ namespace project3_ecommerce.Models
         Điện_thoại,
         [Description("Phụ kiện")]
         Phụ_kiện,
+        [Description("Khác")]
+        Khác,
     }
 }

@@ -15,6 +15,7 @@
           <Property Name="Key" Type="varbinary(max)" Nullable="false" />
           <Property Name="Password" Type="nvarchar(max)" Nullable="false" />
           <Property Name="CartInfo" Type="nvarchar(max)" />
+          <Property Name="Admin" Type="int" Nullable="false" />
         </EntityType>
         <EntityContainer Name="AccountModelStoreContainer">
           <EntitySet Name="Account" EntityType="Self.Account" Schema="dbo" store:Type="Tables" />
@@ -36,6 +37,7 @@
           <Property Name="Key" Type="Binary" Nullable="false" MaxLength="Max" FixedLength="false" />
           <Property Name="Password" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="CartInfo" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Admin" Type="Int32" Nullable="false" />
         </EntityType>
       </Schema>
     </edmx:ConceptualModels>
@@ -46,6 +48,7 @@
           <EntitySetMapping Name="Accounts">
             <EntityTypeMapping TypeName="AccountModel.Account">
               <MappingFragment StoreEntitySet="Account">
+                <ScalarProperty Name="Admin" ColumnName="Admin" />
                 <ScalarProperty Name="CartInfo" ColumnName="CartInfo" />
                 <ScalarProperty Name="Password" ColumnName="Password" />
                 <ScalarProperty Name="Key" ColumnName="Key" />

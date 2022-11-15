@@ -16,6 +16,11 @@ namespace project3_ecommerce
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+            HttpContext context = HttpContext.Current;
+            if (context != null && context.Session != null)
+            {
+                Session.Timeout = 10000;
+            }
         }
     }
 }

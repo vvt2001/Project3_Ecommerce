@@ -3,48 +3,77 @@
 @{
     ViewBag.Title = "Details";
 }
+<style>
+    .item-header {
+        font-weight: bold;
+        font-size: 50px;
+        padding-left: 20px;
+    }
 
-<h2>Details</h2>
+    .item-price {
+        font-weight: bold;
+        font-size: x-large;
+        padding-left: 20px;
+        display:inline-block;
+    }
 
-<div>
-    <h4>Product</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
+    .btn {
+        background-color: black;
+        color: white;
+        margin: 3px 3px 3px 3px;
+        width: 100%;
+        font-weight: bold;
+        max-width: none;
+    }
 
-        <dd>
-            @Html.DisplayFor(model => model.Name)
-        </dd>
+    .item-desc {
+        padding-left: 20px;
+    }
+    .item-quantity {
+        float: right;
+        width: 50px;
+        display: inline-block;
+    }
+</style>
+<h2>Thông tin sản phẩm</h2>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.Image)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.Image)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.Price)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.Price)
-        </dd>
-
-    </dl>
+<div class="container col-md-6">
+    <img alt="" src="@Model.ImagePath" @*style="height:250px;width:250px;" *@ />
 </div>
-<p>
-    @Html.ActionLink("Edit", "Edit", new { id = Model.ID }) |
-    @Html.ActionLink("Back to List", "Index")
-</p>
+<div class="container col-md-6">
+    <div class="row item-header">@Model.Name</div><br />
+    <div class="row item-price">@Model.Price VND</div>
+    <input id="item-quantity" type="text" class="item-quantity" onkeypress = "return isNumber(event)">
+    <br />
+    <input type="button" value="Đặt hàng" class="btn" onclick="AddToCart(@Model.ID)"><hr />
+    <div class="row item-desc">@Model.Description</div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script>
+    function AddToCart(ID) {
+        $.ajax({
+            url: '@Url.Action("AddToCart")',
+            type: 'POST',
+            data: jQuery.param({ ID: ID, quantity: document.getElementById('item-quantity').value }),
+            success: function () {
+                toastr.success("Đã thêm sản phẩm vào giỏ hàng, xin kiểm tra.","Thông báo");
+            },
+            error: function () {
+                toastr.error("Có lỗi trong việc thêm sản phẩm vào giỏ hàng.","Lỗi!");
+            },
+        });
+        return false;
+    }
+    function isNumber(evt) {
+        evt = (evt) ? evt : window.event;
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+            return false;
+        }
+        return true;
+    }
+
+    </script>
+}
