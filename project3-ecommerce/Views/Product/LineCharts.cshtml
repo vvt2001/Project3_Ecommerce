@@ -1,0 +1,206 @@
+﻿@model IEnumerable<project3_ecommerce.Models.Sale>
+
+@{
+	ViewBag.Title = "Thống kê doanh thu";
+	int count = 0;
+}
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<style>
+		.chart {
+			height: 370px;
+			width: 100%;
+			margin-top: 100px;
+		}
+
+		.form-control {
+			width: 165px;
+			float: right;
+		}
+
+		#title {
+			text-align: center;
+			font-weight: bold;
+			margin-top: 30px;
+		}
+		body {
+			font-family: Verdana, sans-serif;
+			margin: 20px 20px 20px 20px;
+		}
+	</style>
+	<script>
+		window.onload = function () {
+
+			var chartDoanhThu = new CanvasJS.Chart("chartDoanhThuContainer", {
+				animationEnabled: true,
+				title: {
+					text: "Tổng Doanh thu",
+					fontFamily: "Times New Roman",
+					fontWeight: "bold",
+				},
+				axisY: {
+					title: "VND"
+				},
+				axisX: {
+					title: "Tháng"
+				},
+				toolTip: {
+					shared: true
+				},
+				data: [{
+					type: "line",
+					name: "Máy tính",
+					click: onClick,
+					showInLegend: true,
+					dataPoints: @Html.Raw(ViewBag.LineChartDoanhThu1)
+				}, {
+					type: "line",
+					name: "Điện thoại",
+					click: onClick,
+					showInLegend: true,
+					dataPoints: @Html.Raw(ViewBag.LineChartDoanhThu2)
+				}, {
+					type: "line",
+					name: "Phụ kiện",
+					click: onClick,
+					showInLegend: true,
+					dataPoints: @Html.Raw(ViewBag.LineChartDoanhThu3)
+				}, {
+					type: "line",
+					name: "Khác",
+					click: onClick,
+					showInLegend: true,
+					dataPoints: @Html.Raw(ViewBag.LineChartDoanhThu4)
+				}]
+			});
+			chartDoanhThu.render();
+
+			var chartSoSanPhamDaBan = new CanvasJS.Chart("chartSoSanPhamDaBanContainer", {
+				animationEnabled: true,
+				title: {
+					text: "Số sản phẩm đã bán",
+					fontFamily: "Times New Roman",
+					fontWeight: "bold",
+
+				},
+				axisY: {
+					title: "Sản phẩm"
+				},
+				axisX: {
+					title: "Tháng"
+				},
+				toolTip: {
+					shared: true
+				},
+				data: [{
+					type: "line",
+					name: "Máy tính",
+					click: onClick,
+					showInLegend: true,
+					dataPoints: @Html.Raw(ViewBag.LineChartSoSanPhamDaBan1)
+				}, {
+					type: "line",
+					name: "Điện thoại",
+					click: onClick,
+					showInLegend: true,
+					dataPoints: @Html.Raw(ViewBag.LineChartSoSanPhamDaBan2)
+				}, {
+					type: "line",
+					name: "Phụ kiện",
+					click: onClick,
+					showInLegend: true,
+					dataPoints: @Html.Raw(ViewBag.LineChartSoSanPhamDaBan3)
+				}, {
+					type: "line",
+					name: "Khác",
+					click: onClick,
+					showInLegend: true,
+					dataPoints: @Html.Raw(ViewBag.LineChartSoSanPhamDaBan4)
+				}]
+			});
+			chartSoSanPhamDaBan.render();
+
+			var chartSoSanPhamConLai = new CanvasJS.Chart("chartSoSanPhamConLaiContainer", {
+				animationEnabled: true,
+				title: {
+					text: "Số sản phẩm còn lại",
+					fontFamily: "Times New Roman",
+					fontWeight: "bold",
+
+				},
+				axisY: {
+					title: "Sản phẩm"
+				},
+				axisX: {
+					title: "Tháng"
+				},
+				toolTip: {
+					shared: true
+				},
+				data: [{
+					type: "line",
+					name: "Máy tính",
+					click: onClick,
+					showInLegend: true,
+					dataPoints: @Html.Raw(ViewBag.LineChartSoSanPhamConLai1)
+				}, {
+					type: "line",
+					name: "Điện thoại",
+					click: onClick,
+					showInLegend: true,
+					dataPoints: @Html.Raw(ViewBag.LineChartSoSanPhamConLai2)
+				}, {
+					type: "line",
+					name: "Phụ kiện",
+					click: onClick,
+					showInLegend: true,
+					dataPoints: @Html.Raw(ViewBag.LineChartSoSanPhamConLai3)
+				}, {
+					type: "line",
+					name: "Khác",
+					click: onClick,
+					showInLegend: true,
+					dataPoints: @Html.Raw(ViewBag.LineChartSoSanPhamConLai4)
+				}]
+			});
+			chartSoSanPhamConLai.render();
+		}
+		function reloadChart(value) {
+			console.log(value);
+			console.log(typeof (value));
+
+			var url = '@Url.Action("LineCharts", "Product", new { year = "__value__" })';
+			window.location.href = url.replace('__value__', value);
+		}
+		function onClick(e) {
+			console.log(e);
+			console.log(typeof (e));
+
+			var url = '@Url.Action("Charts", "Product", new { currentTime = "__value__" })';
+			window.location.href = url.replace('__value__', e.dataPoint.label + "/01/" + @ViewBag.SelectedTime);
+		}
+	</script>
+</head>
+<body>
+	<div style="margin:20px 20px 20px 20px">
+
+		<h1 id="title">Năm @ViewBag.SelectedTime</h1>
+		<select class="form-control" id="month" onchange="reloadChart(this.value)">
+			<option value="">-Chọn thời gian-</option>
+			@while (count < 5)
+			{
+				<option value="@(ViewBag.CurrentYear-count)">@(ViewBag.CurrentYear-count)</option>
+				count++;
+			}
+		</select>
+		<div id="charts">
+			<div class="chart" id="chartDoanhThuContainer"></div>
+			<div class="chart" id="chartSoSanPhamDaBanContainer"></div>
+			<div class="chart" id="chartSoSanPhamConLaiContainer"></div>
+		</div>
+	</div>
+		<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+</body>
+</html>         

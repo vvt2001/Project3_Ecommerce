@@ -39,6 +39,8 @@ namespace project3_ecommerce.Models
     }
     public enum Category
     {
+        [Description("-Danh mục sản phẩm-")]
+        Danh_mục_sản_phẩm,
         [Description("Máy tính")]
         Máy_tính,
         [Description("Điện thoại")]

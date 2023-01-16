@@ -1,66 +1,198 @@
-﻿@model project3_ecommerce.Models.Product
+﻿@model project3_ecommerce.Models.ProductViewModel
 
 @{
-    ViewBag.Title = "Edit";
+    ViewBag.Title = "Chỉnh sửa thông tin";
+    if (Session["ID"] == null && (Session["Admin"] == null || Session["Admin"].ToString() != "1"))
+    {
+        Response.Redirect(Url.Action("Index", "Account"));
+    }
 }
+<style>
+    .form-control {
+        max-width: 300px;
+    }
+    #title {
+        text-align: left;
+    }
+    body {
+        font-family: Verdana, sans-serif;
+        margin: 20px 20px 20px 20px;
+    }
+</style>
+<body>
 
-<h2>Edit</h2>
+    <h2 style="font-weight: bold; margin: 20px 20px 20px 20px;">Chỉnh sửa thông tin</h2>
 
+    <div style="margin: 20px 20px 20px 20px;">
+        @using (Html.BeginForm("Edit", "Product", FormMethod.Post, new { enctype = "multipart/form-data", id = "submit-upload-file" }))
+        {
+            @Html.AntiForgeryToken()
 
-@using (Html.BeginForm())
-{
-    @Html.AntiForgeryToken()
-    
-    <div class="form-horizontal">
-        <h4>Product</h4>
-        <hr />
-        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-        @Html.HiddenFor(model => model.ID)
+            <div class="form-horizontal" style="border:1px solid lightgray; border-radius:4px 4px 4px 4px; padding:20px 20px 20px 20px">
+                @Html.HiddenFor(model => model.Product.ID)
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Product.Name, htmlAttributes: new { @class = "control-label col-md-2", id = "title" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Product.Name, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.Product.Name, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Product.Category, htmlAttributes: new { @class = "control-label col-md-2", id = "title" })
+                    <div class="col-md-10">
+                        @Html.DropDownListFor(model => model.Product.Category_EnumValue, ViewBag.Category_EnumList as SelectList, new { Class = "form-control" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Product.Price, htmlAttributes: new { @class = "control-label col-md-2", id = "title" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Product.Price, new { htmlAttributes = new { @class = "form-control", onkeypress = "return isNumber(event)" } })
+                        @Html.ValidationMessageFor(model => model.Product.Price, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Product.RemainStocks, htmlAttributes: new { @class = "control-label col-md-2", id = "title" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Product.RemainStocks, new { htmlAttributes = new { @class = "form-control", onkeypress = "return isNumber(event)" } })
+                        @Html.ValidationMessageFor(model => model.Product.RemainStocks, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Product.ImageFileUpload, htmlAttributes: new { @class = "control-label col-md-2", id = "title" })
+                    <div class="col-md-10">
+                        <div id="file-upload-section">
+                            <table>
+                                @if (Model != null)
+                                {
+                                    foreach (var item in Model.Images)
+                                    {
+                                        <tr>
+                                            <td>
+                                                @if (item.ImagePath != null)
+                                                {
+                                                    <img src="@item.ImagePath" style="width:100px;height:100px;object-fit:contain" />
+                                                }
+                                            </td>
+                                            <td style="padding-left:20px">
+                                                <input type="button" value="x" class="btn btn-default" style="border:none" onclick="DeleteFile(@item.ID)" />
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </table>
+                            <div class="text-danger">
+                                @ViewBag.FileStatus
+                            </div>
+                        </div>
+                        @Html.TextBoxFor(model => model.EmpFileModel.fileUpload, "", new { @type = "file", @multiple = "multiple", @id = "uploaded-file", @onchange = "checkSize(this)" })
+                        <div class="form-group">
+                            <div class="col-md-offset-2 col-md-10">
+                                <input type="button" value="Đăng tải file" class="btn btn-default" id="upload-btn" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group" style="padding-left:12px">
+                    <input type="submit" value="Lưu" class="btn" style="color:white;background-color:black" />
+                    <a class="btn" href="@Url.Action("GetList","Product")" style="color:black;background-color:whitesmoke">Về danh sách</a>
+                </div>
             </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.Image, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.Image, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.Image, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.Price, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.Price, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.Price, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Save" class="btn btn-default" />
-            </div>
-        </div>
+        }
     </div>
-}
-
-<div>
-    @Html.ActionLink("Back to List", "Index")
-</div>
+</body>
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
+<script>
+    function isNumber(evt) {
+        evt = (evt) ? evt : window.event;
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+            return false;
+        }
+        return true;
+    }
+
+    var IDCount = @Html.Raw(Json.Encode(@ViewBag.IDCount));
+    var FilesID = @Html.Raw(Json.Encode(@ViewBag.FilesID));
+    var ProductID = @Html.Raw(Json.Encode(@ViewBag.ProductID));
+
+    $(function () {
+        $("#upload-btn").click(function FilesID() {
+            var formData = new FormData($('#submit-upload-file')[0]);
+            formData.append("ProductID", ProductID);
+            $.ajax({
+                // Your server script to process the upload
+                url: '@Url.Action("UploadFile")',
+                type: 'POST',
+                // Form data
+                data: formData,
+                // Tell jQuery not to process data or worry about content-type
+                // You *must* include these options!
+                cache: false,
+                contentType: false,
+                processData: false,
+                // Custom XMLHttpRequest
+                xhr: function () {
+                    var myXhr = $.ajaxSettings.xhr();
+                    if (myXhr.upload) {
+
+                    }
+                    return myXhr;
+                },
+                success: function (data) {
+                    data.forEach(addFile);
+                    LoadData(ProductID);
+                },
+                error: function () {
+                    toastr.error("Có lỗi trong việc đăng tải file.", "Lỗi!");
+                },
+            });
+        });
+
+    });
+
+    function LoadData(ProductID) {
+        $("#file-upload-section").load(ProductID.toString() + " #file-upload-section");
+        console.log(IDCount);
+        console.log(FilesID);
+        return false;
+    }
+
+    function DeleteFile(ID) {
+        $.ajax({
+            url: '@Url.Action("DeleteFileAjax")',
+            type: 'POST',
+            data: jQuery.param({ FileID: ID, ProductID: ProductID }),
+            success: function () {
+                IDCount--;
+                const index = FilesID.indexOf(ID);
+                FilesID.splice(index, 1);
+                LoadData(ProductID);
+            },
+            error: function () {
+                toastr.error("Có lỗi trong việc xóa file.", "Lỗi!");
+            },
+        });
+        return false;
+    }
+
+    function addFile(item) {
+        FilesID.push(item);
+        IDCount++;
+    }
+
+    function checkSize(input) {
+        if (input.files && input.files[0].size > (2 * 1024 * 1024 * 1024)) {
+            toastr.error("Kích thước file quá lớn.", "Lỗi!");
+            input.value = null;
+        }
+    }
+</script>
 }

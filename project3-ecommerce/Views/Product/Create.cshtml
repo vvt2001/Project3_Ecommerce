@@ -1,4 +1,4 @@
-﻿@model project3_ecommerce.Models.Product
+﻿@model project3_ecommerce.Models.ProductViewModel
 
 @{
     ViewBag.Title = "Thêm sản phẩm";
@@ -11,75 +11,75 @@
     .form-control {
         max-width: 300px;
     }
+    #title{
+        text-align:left;
+    }
+    body {
+        font-family: Verdana, sans-serif;
+        margin: 20px 20px 20px 20px;
+    }
 </style>
-<h2>Thêm sản phẩm mới</h2>
+<body>
 
+    <h2 style="font-weight: bold; margin: 20px 20px 20px 20px">Thêm sản phẩm mới</h2>
 
-@using (Html.BeginForm("Create", "Product", FormMethod.Post, new { enctype = "multipart/form-data" })) 
-{
-    @Html.AntiForgeryToken()
+    <div style="margin: 20px 20px 20px 20px">
 
-<div class="form-horizontal">
-    <hr />
-    @Html.HiddenFor(model => model.ID)
+        @using (Html.BeginForm("Create", "Product", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            @Html.AntiForgeryToken()
 
-    <div class="form-group">
-        @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
-            @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
-        </div>
+            <div class="form-horizontal" style="border:1px solid lightgray; border-radius:4px 4px 4px 4px; padding:20px 20px 20px 20px">
+                @Html.HiddenFor(model => model.Product.ID)
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Product.Name, htmlAttributes: new { @class = "control-label col-md-2", @id = "title" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Product.Name, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.Product.Name, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Product.Category, htmlAttributes: new { @class = "control-label col-md-2", @id = "title" })
+                    <div class="col-md-10">
+                        @Html.DropDownListFor(model => model.Product.Category_EnumValue, ViewBag.Category_EnumList as SelectList, new { Class = "form-control" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Product.Price, htmlAttributes: new { @class = "control-label col-md-2", @id = "title" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Product.Price, new { htmlAttributes = new { @class = "form-control", onkeypress = "return isNumber(event)" } })
+                        @Html.ValidationMessageFor(model => model.Product.Price, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Product.RemainStocks, htmlAttributes: new { @class = "control-label col-md-2", @id = "title" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Product.RemainStocks, new { htmlAttributes = new { @class = "form-control", onkeypress = "return isNumber(event)" } })
+                        @Html.ValidationMessageFor(model => model.Product.RemainStocks, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Product.ImageFileUpload, htmlAttributes: new { @class = "control-label col-md-2", @id = "title" })
+                    <div class="col-md-7">
+                        @Html.TextBoxFor(model => model.EmpFileModel.fileUpload, "", new { @type = "file", @multiple = "multiple", @onchange = "checkSize(this)" })
+                        @Html.ValidationMessageFor(model => model.EmpFileModel.fileUpload, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group" style="padding-left:12px">
+                    <input type="submit" value="Tạo" class="btn" style="color:white;background-color:black" />
+                    <a class="btn" href="@Url.Action("Index","Product")" style="color:black;background-color:whitesmoke">Về trang chủ</a>
+                </div>
+            </div>
+        }
+
     </div>
-
-    <div class="form-group">
-        @Html.LabelFor(model => model.Category, htmlAttributes: new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            @Html.DropDownListFor(model => model.Category_EnumValue, ViewBag.Category_EnumList as SelectList, new { Class = "form-control" })
-        </div>
-    </div>
-
-    <div class="form-group">
-        @Html.LabelFor(model => model.Price, htmlAttributes: new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            @Html.EditorFor(model => model.Price, new { htmlAttributes = new { @class = "form-control", onkeypress = "return isNumber(event)" } })
-            @Html.ValidationMessageFor(model => model.Price, "", new { @class = "text-danger" })
-        </div>
-    </div>
-
-    <div class="form-group">
-        @Html.LabelFor(model => model.RemainStocks, htmlAttributes: new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            @Html.EditorFor(model => model.RemainStocks, new { htmlAttributes = new { @class = "form-control", onkeypress = "return isNumber(event)" } })
-            @Html.ValidationMessageFor(model => model.RemainStocks, "", new { @class = "text-danger" })
-        </div>
-    </div>
-
-    <div class="form-group">
-        @Html.LabelFor(model => model.ImageFileUpload, htmlAttributes: new { @class = "control-label col-md-2" })
-        <div class="col-md-7">
-            @Html.TextBoxFor(model => model.ImageFileUpload, "", new { @type = "file" })
-            @Html.ValidationMessageFor(model => model.ImageFileUpload, "", new { @class = "text-danger" })
-        </div>
-    </div>
-
-    <div class="form-group">
-        @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            @Html.TextAreaFor(model => model.Description, new { htmlAttributes = new { @class = "form-control" } })
-            @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
-        </div>
-    </div>
-    <div class="form-group">
-        <div class="col-md-offset-2 col-md-10">
-            <input type="submit" value="Tạo" class="btn btn-secondary" />
-        </div>
-    </div>
-</div>
-}
-
-<div class="col-md-offset-2">
-    @Html.ActionLink("Về trang chủ", "Index")
-</div>
+</body>
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
@@ -91,6 +91,12 @@
             return false;
         }
         return true;
+    }
+    function checkSize(input) {
+        if (input.files && input.files[0].size > (2 * 1024 * 1024 * 1024)) {
+            toastr.error("Kích thước file quá lớn.", "Lỗi!");
+            input.value = null;
+        }
     }
 </script>
 }

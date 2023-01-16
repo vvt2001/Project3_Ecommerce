@@ -1,0 +1,160 @@
+﻿@model IEnumerable<project3_ecommerce.Models.Message>
+@using project3_ecommerce.Models
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+
+<style>
+    /* A CIRCLE LIKE BUTTON IN THE TOP MENU. */
+    #noti_Button {
+    margin: -3px 10px 0 10px;
+    cursor: pointer;
+    color:whitesmoke;
+    }
+    #noti_Button:hover{
+        color:white;
+    }
+    /* THE POPULAR RED NOTIFICATIONS COUNTER. */
+    #noti_Counter {
+    display: block;
+    position: absolute;
+    background: #E1141E;
+    color: #FFF;
+    font-size: 12px;
+    font-weight: normal;
+    padding: 1px 3px;
+    margin: -8px 0 0 25px;
+    border-radius: 2px;
+    z-index: 1;
+    }
+    /* THE NOTIFICAIONS WINDOW. THIS REMAINS HIDDEN WHEN THE PAGE LOADS. */
+    #notifications {
+    display: none;
+    width: 430px;
+    position: absolute;
+    top: 30px;
+    left: 0;
+    background: #FFF;
+    border: solid 1px rgba(100, 100, 100, .20);
+    -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, .20);
+    z-index: 0;
+    }
+    /* AN ARROW LIKE STRUCTURE JUST OVER THE NOTIFICATIONS WINDOW */
+    #notifications:before {
+    content: '';
+    display: block;
+    width: 0;
+    height: 0;
+    color: transparent;
+    border: 10px solid #CCC;
+    border-color: transparent transparent #FFF;
+    margin-top: -20px;
+    margin-left: 10px;
+    }
+    .main-title {
+    display: block;
+    color: #333;
+    background: #FFF;
+    font-weight: bold;
+    font-size: 25px;
+    padding: 8px;
+    margin: 0;
+    border-bottom: solid 1px rgba(100, 100, 100, .30);
+    text-align: center;
+    }
+    #noti {
+    min-height: 60px;
+    padding: 5px;
+@*    border-bottom: solid 1px rgba(100, 100, 100, .30);
+*@    }
+    #noti:hover {
+        background-color: whitesmoke;
+        cursor:pointer
+    }
+    .noti-title {
+    @* display: block;
+    *@ color: #333;
+@*    background: #FFF;
+*@    font-weight: bold;
+    font-size: 15px;
+    }
+    .noti-container {
+    max-height: 300px;
+    overflow-y: scroll;
+    }
+    .seeAll {
+    background: #F6F7F8;
+    padding: 8px;
+    font-size: 12px;
+    font-weight: bold;
+    border-top: solid 1px rgba(100, 100, 100, .30);
+    text-align: center;
+    }
+    .seeAll a {
+    color: #3b5998;
+    }
+    .seeAll a:hover {
+    background: #F6F7F8;
+    color: #3b5998;
+    text-decoration: underline;
+    }
+    .null{
+        text-align:center;
+@*        font-weight:bold;
+*@        min-height:30px;
+        vertical-align:central;
+    }
+    p {
+        margin-bottom: 2px
+    }
+</style>
+@if (Model != null && Model.Count() > 0)
+{
+    var count = 0;
+    var lastGroupName = "";
+    foreach (var item in Model)
+    {
+        if (lastGroupName != item.GroupName)
+        {
+            lastGroupName = item.GroupName;
+            count++;
+        }
+    }
+<div id="noti_Counter">@count</div>
+}
+<div id="noti_Button" class="fa fa-bell"></div>
+<div id="notifications">
+    <h3 class="main-title">Thông báo</h3>
+    <div class="noti-container" style="max-height:300px;">
+        @if (Model != null && Model.Count() > 0)
+        {
+            var lastGroupName = "";
+            foreach (var item in Model)
+            {
+                if (lastGroupName != item.GroupName)
+                {
+                    lastGroupName = item.GroupName;
+                    <div id="noti" onclick="openChat('@item.GroupName')">
+                        <p class="noti-title">@item.SenderName</p>
+                        <p>@item.Message1</p>
+                        @if (item.Date != null)
+                        {
+                            <p style="float:right">@item.Date.Value.ToString("HH:mm")</p>
+                        }
+                    </div>
+                }
+            }
+        }
+        else
+        {
+            <div class="null" style="margin-top:15px">
+                Không có thông báo mới
+            </div>
+        }
+    </div>
+</div>
+
+@*<script>
+        function redirect(id) {
+            var url = '@Url.Action("Details", "ThongBaoMoiThau", new { id = "__id__" })';
+            window.location.href = url.replace('__id__', id);
+        }
+    </script>*@

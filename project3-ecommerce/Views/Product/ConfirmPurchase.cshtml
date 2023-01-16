@@ -1,7 +1,18 @@
 ﻿@{
     ViewBag.Title = "Thank you";
 }
-<h2>@ViewBag.Title.</h2>
-<h3>Cảm ơn đã mua hàng!</h3>
+<style>
+    body {
+        font-family: Verdana, sans-serif;
+        margin: 20px 20px 20px 20px;
+    }
+</style>
+<body>
+    <div style="margin: 20px 20px 20px 20px">
 
-@Html.ActionLink("Quay lại trang chủ", "Index", "Product", new { @class = "btn btn-secondary" ,@style= "background-color:black;color:white;margin-top:5px" })
+        <h2>@ViewBag.Title.</h2>
+        <h3>Cảm ơn đã mua hàng!</h3>
+
+        @Html.ActionLink("Quay lại trang chủ", "Index", "Product", new { @class = "btn btn-secondary", @style = "background-color:black;color:white;margin-top:5px" })
+    </div>
+</body>

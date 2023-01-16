@@ -1,4 +1,15 @@
-﻿<!DOCTYPE html>
+﻿@{
+    if (Session["Username"] == null)
+    {
+        Session["Username"] = "0";
+    }
+    if (Session["Admin"] == null)
+    {
+        Session["Admin"] = "0";
+    }
+    var currentGroupName = "vvt";
+}
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -37,6 +48,115 @@
         .dropdown:hover .dropdown-content {
             display: block;
         }
+
+        body {
+            background-color: whitesmoke;
+        }
+
+        {
+            box-sizing: border-box;
+        }
+
+        /* Button used to open the chat form - fixed at the bottom of the page */
+        .open-button {
+            background-color: #555;
+            color: white;
+            border: none;
+            cursor: pointer;
+            opacity: 0.8;
+            position: fixed;
+            bottom: 23px;
+            right: 28px;
+            width: 80px;
+            height: 80px;
+            z-index: 9;
+            border-radius: 40px 40px 40px 40px;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        /* The popup chat - hidden by default */
+        .form-popup {
+            display: none;
+            position: fixed;
+            bottom: 23px;
+            right: 15px;
+            border: 1px solid #f1f1f1;
+            border-radius: 5px;
+            z-index: 9;
+        }
+
+        /* Add styles to the form container */
+        .message-container {
+            max-width: 300px;
+            padding: 10px 10px 10px 10px;
+            background-color: white;
+            word-wrap:break-word;
+            overflow-wrap:break-word;
+        }
+
+            /* Full-width textarea */
+            .message-container input {
+                width: 70%;
+                margin: 10px 0 5px 0;
+                border: none;
+                resize: none;
+                background: #f1f1f1;
+                height: 30px;
+                font-size: 15px;
+                display: inline-block;
+                border-radius: 4px;
+                padding-left: 3px;
+                outline: none;
+            }
+
+@*                /* When the textarea gets focus, do something */
+                .message-container input:focus {
+                    background-color: #ddd;
+                    outline: none;
+                }*@
+
+            /* Set a style for the submit/login button */
+            .message-container .btn {
+                background-color: #04AA6D;
+                color: white;
+                border: none;
+                cursor: pointer;
+                width: 25%;
+                height: 30px;
+                margin-bottom: 10px;
+                opacity: 0.8;
+                display: inline-block;
+                float: right;
+                margin: 10px 0 5px 0;
+                text-align:center
+            }
+
+            /* Add a red background color to the cancel button */
+            .message-container .cancel {
+                background-color: red;
+                position: relative;
+                width: 20px;
+                height: 20px;
+                display: inline-block;
+                float: right;
+                margin-bottom: 0px;
+                padding: 2px 3px 3px 3px;
+            }
+
+            /* Add some hover effects to buttons */
+            .message-container .btn:hover, .open-button:hover {
+                opacity: 1;
+            }
+
+        #chat-message-container {
+            height: 300px;
+            border: 1px solid #f1f1f1;
+        }
+
+        #noti_Container {
+            margin-top: 18px;
+        }
     </style>
 </head>
 <body>
@@ -65,11 +185,15 @@
                     {
                         if (Session["Admin"].ToString() == "1")
                         {
+                            <li id="noti_Container">
+                                @Html.Action("Notifications", "Product")
+                            </li>
                             <li class="dropdown">
                                 <a href="#">Quản trị</a>
                                 <div class="dropdown-content" style="width:200px">
                                     @Html.ActionLink("Thêm sản phẩm mới", "Create", "Product")
                                     @Html.ActionLink("Danh sách sản phẩm", "GetList", "Product")
+                                    @Html.ActionLink("Thống kê doanh thu", "LineCharts", "Product")
                                 </div>
                             </li>
                         }
@@ -92,8 +216,34 @@
             </div>
         </div>
     </div>
-    <div class="container body-content" style="min-height: 90vh">
+    <div class="container body-content" style="min-height: 90vh; background-color: white; padding: 0 0 0 0; border-radius: 4px 4px 4px 4px">
+
         @RenderBody()
+        @if (Session["ID"] != null && Session["Username"] != null)
+        {
+            if (Session["Admin"].ToString() != "1")
+            {
+                <button class="open-button" id="chatButton" onclick="openForm()">Chat</button>
+
+            }
+
+            <div class="form-popup" id="myForm">
+                <div class="message-container">
+                    <h1 style="display:inline-block; margin-top:0px">Chat</h1>
+                    <button type="button" class="btn cancel" onclick="closeForm()">X</button>
+                    <br />
+                    <div id="chat-message-container">
+                        <ul id="discussion" style="list-style-type: none;padding:5px 5px 5px 5px;">
+                        </ul>
+                    </div>
+                    <input type="text" required id="message">
+
+                    <input class="btn" type="button" id="sendmessage" value="Send" />
+                    <input type="hidden" id="displayname" />
+                    <input type="hidden" id="groupname" />
+                </div>
+            </div>
+        }
     </div>
 
     <div class="container body-content" style="width: 85%; margin-top: auto;">
@@ -110,3 +260,124 @@
     @RenderSection("scripts", required: false)
 </body>
 </html>
+<script>
+    function openForm() {
+        document.getElementById("myForm").style.display = "block";
+        if(@Session["Admin"].ToString() != "1")
+        {
+            document.getElementById("chatButton").style.display = "none";
+        }
+    }
+
+    function closeForm() {
+        if(@Session["Admin"].ToString() != "1")
+        {
+            document.getElementById("chatButton").style.display = "block";
+        }
+        document.getElementById("myForm").style.display = "none";
+    }
+
+    $(function () {
+
+        // Reference the auto-generated proxy for the hub.
+        var chat = $.connection.chatHub;
+
+        var groupName = '@currentGroupName';
+        var currentDate = new Date();
+        // Create a function that the hub can call back to display messages.
+        chat.client.addNewMessageToPage = function (name, message) {
+            // Add the message to the page.
+            $('#discussion').append('<li><strong>' + htmlEncode(name)
+                + '</strong>' + '[' + htmlEncode(('0' + currentDate.getHours()).slice(-2)) + ':' + htmlEncode(('0' + currentDate.getMinutes()).slice(-2)) + ']' + ': ' + htmlEncode(message) + '</li>');
+        };
+
+@*        // Get the user name and store it to prepend to messages.
+        $('#displayname').val(prompt('Enter your name:', ''));
+        $('#groupname').val(prompt('Enter your group name:', ''));*@
+
+        // Set initial focus to message input box.
+        $('#message').focus();
+        // Start the connection.
+        $.connection.hub.start().done(function () {
+            if (@Session["Admin"].ToString() != "1")
+            {
+                chat.server.joinRoom(groupName);
+            }
+            $('#sendmessage').click(function () {
+                // Call the Send method on the hub.
+                chat.server.sendGroup(groupName, $('#message').val(), groupName);
+
+                // Clear text box and reset focus for next comment.
+                $('#message').val('').focus();
+            });
+        });
+    });
+    // This optional function html-encodes messages for display in the page.
+    function htmlEncode(value) {
+        var encodedValue = $('<div />').text(value).html();
+        return encodedValue;
+    }
+
+    function openChat(groupName) {
+        $('#discussion').empty();
+        var chat = $.connection.chatHub;
+
+        // Create a function that the hub can call back to display messages.
+        chat.client.addNewMessageToPage = function (name, message) {
+            // Add the message to the page.
+            $('#discussion').append('<li><strong>' + htmlEncode(name)
+                + '</strong>' + '[' + htmlEncode(('0' + currentDate.getHours()).slice(-2)) + ':' + htmlEncode(('0' + currentDate.getMinutes()).slice(-2)) + ']' + ': ' + htmlEncode(message) + '</li>');
+        };
+
+        chat.server.leaveRoom('@currentGroupName');
+        chat.server.joinRoom(groupName);
+
+        @currentGroupName = groupName;
+
+        document.getElementById("myForm").style.display = "block";
+
+    }
+</script>
+
+<script>
+    $(document).ready(function () {
+        // ANIMATEDLY DISPLAY THE NOTIFICATION COUNTER.
+        $('#noti_Counter')
+            .css({ opacity: 0 })
+            .css({ top: '-10px' })
+            .animate({ top: '-2px', opacity: 1 }, 500);
+        $('#noti_Button').click(function () {
+            // TOGGLE (SHOW OR HIDE) NOTIFICATION WINDOW.
+            $('#notifications').fadeToggle('fast', 'linear', function () {
+@*                if ($('#notifications').is(':hidden')) {
+                    $('#noti_Button').css('color', 'whitesmoke');
+                }
+                // CHANGE COLOR OF THE BUTTON.
+                else $('#noti_Button').css('color', 'white');*@
+            });
+            return false;
+        });
+        // HIDE NOTIFICATIONS WHEN CLICKED ANYWHERE ON THE PAGE.
+        $(document).click(function () {
+            $('#notifications').hide();
+@*            // CHECK IF NOTIFICATION COUNTER IS HIDDEN.
+            if ($('#noti_Counter').is(':hidden')) {
+                // CHANGE COLOR OF THE BUTTON.
+                $('#noti_Button').css('color', 'whitesmoke');
+            }*@
+        });
+        $('#notifications').click(function () {
+            return false;       // DO NOTHING WHEN CONTAINER IS CLICKED.
+        });
+    });
+</script>
+
+<script>
+
+</script>
+<!--Script references. -->
+<!--The jQuery library is required and is referenced by default in _Layout.cshtml. -->
+<!--Reference the SignalR library. -->
+<script src="~/Scripts/jquery.signalR-2.2.2.min.js"></script>
+<!--Reference the autogenerated SignalR hub script. -->
+<script src="~/signalr/hubs"></script>

@@ -107,7 +107,7 @@
     </div>
 }
 
-<h2 style="display: inline;padding:0 5px 0 20px"> Danh sách sản phẩm </h2>
+<h2 style="display: inline;padding:0 5px 0 20px"> Kết quả tìm kiếm </h2>
 <span style="color:darkgray;display:inline">(Tổng @ViewBag.ProductSum sản phẩm)</span>
 <div class="container" style="margin:10px 0 10px 0">
     @if (Model.ProductModel != null)
@@ -134,7 +134,7 @@
 <div style="text-align:center">
     @if (Model.ProductModel != null)
     {
-        @Html.PagedListPager(Model.ProductModel, page => Url.Action("Index", "Product", new { page }),
+        @Html.PagedListPager(Model.ProductModel, page => Url.Action("SearchResult", "Product", new { Name = ViewBag.Name, Category = ViewBag.Category, LowerPrice = ViewBag.LowerPrice, UpperPrice = ViewBag.UpperPrice, page }),
                  new PagedListRenderOptions
                  {
                      MaximumPageNumbersToDisplay = 5,

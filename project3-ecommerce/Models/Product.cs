@@ -21,10 +21,6 @@ namespace project3_ecommerce.Models
         [Required(ErrorMessage = "Bắt buộc.")]
         [DisplayName("Tên sản phẩm")]
         public string Name { get; set; }
-        [DisplayName("Mô tả")]
-        public string Description { get; set; }
-        [DisplayName("Hình ảnh")]
-        public byte[] Image { get; set; }
         [DataType(DataType.Upload)]
         [DisplayName("Hình ảnh")]
         public HttpPostedFileBase ImageFileUpload { get; set; }

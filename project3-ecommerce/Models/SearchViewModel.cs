@@ -9,5 +9,6 @@ namespace project3_ecommerce.Models
     {
         public SearchModel SearchModel { get; set; }
         public IPagedList<Product> ProductModel { get; set; }
+        public IEnumerable<Image> ImageModel { get; set; }
     }
 }

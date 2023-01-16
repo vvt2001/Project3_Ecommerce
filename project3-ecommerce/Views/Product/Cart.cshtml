@@ -7,58 +7,68 @@
         Response.Redirect("~/Account");
     }
 }
+<style>
+    body {
+        font-family: Verdana, sans-serif;
+        margin: 20px 20px 20px 20px;
+    }
+</style>
+<body>
 
-<h2>Giỏ hàng của tôi</h2>
-<div id="cart">
+    <h2 style="margin: 20px 20px 20px 20px">Giỏ hàng của tôi</h2>
+
+    <div id="cart" style="margin: 20px 20px 20px 20px">
 
 
-    @if (Model != null && Model.Count > 0)
-    {
-        decimal total = 0;
-        int stt = 1;
+        @if (Model != null && Model.Count > 0)
+        {
+            decimal total = 0;
+            int stt = 1;
 
-        <table class="table table-striped table-bordered">
-            <tr>
-                <th>STT</th>
-                <th>Sản phẩm</th>
-                <th>Giá</th>
-                <th>Số lượng</th>
-                <th>Thành tiền</th>
-                <th></th>
-            </tr>
-            @foreach (var cartitem in Model)
-            {
-                var thanhtien = cartitem.Quantity * cartitem.Product.Price;
-                total += thanhtien;
-
+            <table class="table table-striped table-bordered">
                 <tr>
-
-                    <td>@(stt++)</td>
-                    <td>@cartitem.Product.Name</td>
-                    <td>@(cartitem.Product.Price.ToString("n0"))</td>
-                    <td><input asp-for="@cartitem.Quantity" id="@($"Quantity-{cartitem.Product.ID}")" value="@cartitem.Quantity" onkeypress="return isNumber(event)" onchange="UpdateCart(@cartitem.Product.ID)" /></td>
-                    <td>@(thanhtien.ToString("n0"))</td>
-                    <td style="text-align:center">
-                        <input type="button" value="Xóa" class="btn btn-danger" onclick="DeleteCartItem(@cartitem.Product.ID)">
-                    </td>
-
+                    <th>STT</th>
+                    <th>Sản phẩm</th>
+                    <th>Giá</th>
+                    <th>Số lượng</th>
+                    <th>Thành tiền</th>
+                    <th></th>
                 </tr>
-            }
-            <tr>
-                <td colspan="4" class="text-right">Tổng tiền</td>
-                <td>@(total.ToString("n0"))</td>
-                <td></td>
-            </tr>
-        </table>
+                @foreach (var cartitem in Model)
+                {
+                    var thanhtien = cartitem.Quantity * cartitem.Product.Price;
+                    total += thanhtien;
 
-        @Html.ActionLink("Gửi đơn hàng", "CartCheck", "Product", new { @class = "btn btn-success" })
+                    <tr>
 
-    }
-    else
-    {
-        <p class="alert alert-danger">Giỏ hàng trống</p>
-    }
-</div>
+                        <td>@(stt++)</td>
+                        <td>@cartitem.Product.Name</td>
+                        <td>@(cartitem.Product.Price.ToString("n0"))</td>
+                        <td><input asp-for="@cartitem.Quantity" id="@($"Quantity-{cartitem.Product.ID}")" value="@cartitem.Quantity" onkeypress="return isNumber(event)" onchange="UpdateCart(@cartitem.Product.ID)" /></td>
+                        <td>@(thanhtien.ToString("n0"))</td>
+                        <td style="text-align:center">
+                            <input type="button" value="Xóa" class="btn btn-danger" onclick="DeleteCartItem(@cartitem.Product.ID)">
+                        </td>
+
+                    </tr>
+                }
+                <tr>
+                    <td colspan="4" class="text-right">Tổng tiền</td>
+                    <td>@(total.ToString("n0"))</td>
+                    <td></td>
+                </tr>
+            </table>
+
+            @Html.ActionLink("Gửi đơn hàng", "CartCheck", "Product", new { @class = "btn btn-success" })
+
+        }
+        else
+        {
+            <p class="alert alert-danger">Giỏ hàng trống</p>
+        }
+    </div>
+
+</body>
 @section Scripts {
     <script>
         var IDCount = @Html.Raw(Json.Encode(@ViewBag.IDCount));

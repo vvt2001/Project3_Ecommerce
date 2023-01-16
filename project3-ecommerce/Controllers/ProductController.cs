@@ -17,8 +17,11 @@ namespace project3_ecommerce.Controllers
     public class ProductController : Controller
     {
         private ProductEntities db = new ProductEntities();
+        private ImageEntities db1 = new ImageEntities();
         private AccountEntities db2 = new AccountEntities();
         private SalesEntities db3 = new SalesEntities();
+        private InfoEntities db4 = new InfoEntities();
+        private MessageEntities db5 = new MessageEntities();
 
         // Trang chủ
         public ActionResult Index(int? page)
@@ -37,11 +40,12 @@ namespace project3_ecommerce.Controllers
             int pageNumber = (page ?? 1);
 
             SearchViewModel.ProductModel = db.Products.OrderBy(x => x.ID).ToPagedList(pageNumber, pageSize);
+            SearchViewModel.ImageModel = db1.Images.AsEnumerable();
+            ViewBag.ProductSum = db.Products.Count();
             return View(SearchViewModel);
         }
 
-        [HttpPost]
-        public ActionResult Index(SearchViewModel SearchViewModel, int? page)
+        public ActionResult SearchResult(string Name, Category? Category, long? LowerPrice, long? UpperPrice, int? page)
         {
             var Category_EnumData = from Category e in Enum.GetValues(typeof(Category))
                                     select new
@@ -51,27 +55,53 @@ namespace project3_ecommerce.Controllers
                                     };
             ViewBag.Category_EnumList = new SelectList(Category_EnumData, "ID", "Name");
 
-            var searchModel = SearchViewModel.SearchModel;
+            var searchModel = new SearchModel() {
+                Name = Name,
+                Category = Category,
+                LowerPrice = LowerPrice,
+                UpperPrice = UpperPrice,
+            };
+
             var result = db.Products.AsEnumerable();
 
             if (searchModel.Name != null)
                 result = result.Where(x => x.Name.Contains(searchModel.Name));
-            if (searchModel.Category != null)
+            if (searchModel.Category != null && searchModel.Category != Models.Category.Danh_mục_sản_phẩm)
                 result = result.Where(x => x.Category.Contains(searchModel.Category.ToDescriptionString()));
             if (searchModel.LowerPrice != null)
                 result = result.Where(x => x.Price >= searchModel.LowerPrice);
             if (searchModel.UpperPrice != null)
                 result = result.Where(x => x.Price <= searchModel.UpperPrice);
 
+            var SearchViewModel = new SearchViewModel();
+
+            ViewBag.ProductSum = result.Count();
+
             if (result.Any())
             {
-                int pageSize = 10;
+
+                int pageSize = 8;
                 int pageNumber = (page ?? 1);
                 SearchViewModel.ProductModel = result.OrderBy(x => x.ID).ToPagedList(pageNumber, pageSize);
+                SearchViewModel.SearchModel = searchModel;
             }
 
-            return View("Index", SearchViewModel);
+            SearchViewModel.ImageModel = db1.Images.AsEnumerable();
+            ViewBag.Name = Name;
+            if (Category != null && Category != Models.Category.Danh_mục_sản_phẩm)
+                ViewBag.Category = Category;
+            ViewBag.LowerPrice = LowerPrice;
+            ViewBag.UpperPrice = UpperPrice;
+
+            TempData["Name"] = Name;
+            if(Category != null && Category != Models.Category.Danh_mục_sản_phẩm)
+                TempData["Category"] = Category.ToDescriptionString();
+            TempData["LowerPrice"] = LowerPrice;
+            TempData["UpperPrice"] = UpperPrice;
+
+            return View("SearchResult", SearchViewModel);
         }
+
 
         // Key lưu chuỗi json của Cart
         public const string CARTKEY = "Cart";
@@ -353,7 +383,7 @@ namespace project3_ecommerce.Controllers
         }
 
         [HttpPost]
-        public ActionResult Create(Product product)
+        public ActionResult Create(ProductViewModel ProductViewModel)
         {
             var Category_EnumData = from Category e in Enum.GetValues(typeof(Category))
                                     select new
@@ -363,29 +393,77 @@ namespace project3_ecommerce.Controllers
                                     };
             ViewBag.Category_EnumList = new SelectList(Category_EnumData, "ID", "Name");
 
-            product.Category = product.Category_EnumValue.ToDescriptionString();
+            ProductViewModel.Product.Category = ProductViewModel.Product.Category_EnumValue.ToDescriptionString();
 
-            if (product.ImageFileUpload != null)
+            //save 1st image as product avatar
+            if (ProductViewModel.EmpFileModel.fileUpload != null)
             {
-                Stream fileStream = product.ImageFileUpload.InputStream;
-                BinaryReader binaryReader = new BinaryReader(fileStream);
-                byte[] FileDetail = binaryReader.ReadBytes((Int32)fileStream.Length);
+                var fileUpload = ProductViewModel.EmpFileModel.fileUpload.FirstOrDefault();
+                if(fileUpload != null)
+                {
+                    //Save file to designated dir
+                    System.IO.Directory.CreateDirectory(Server.MapPath("~/Uploaded Files/"));
+                    string path = Server.MapPath("~/Uploaded Files/") + fileUpload.FileName;
 
-                product.Image = FileDetail;
-
-                //Save file to designated dir
-                System.IO.Directory.CreateDirectory(Server.MapPath("~/Uploaded Files/"));
-                string path = Server.MapPath("~/Uploaded Files/") + product.ImageFileUpload.FileName;
-
-                //Make sure duplicated files is different when stored in server folder
-                path = GetPath(path, 1);
-                product.ImagePath = "/Uploaded Files/" + Path.GetFileName(path);
-                product.ImageFileUpload.SaveAs(path);
-
+                    //Make sure duplicated files is different when stored in server folder
+                    path = GetPath(path, 1);
+                    ProductViewModel.Product.ImagePath = "/Uploaded Files/" + Path.GetFileName(path);
+                }
             }
 
-            db.Products.Add(product);
+            db.Products.Add(ProductViewModel.Product);
             db.SaveChanges();
+
+            if (ProductViewModel.EmpFileModel.fileUpload != null)
+            {
+                foreach (HttpPostedFileBase fileUpload in ProductViewModel.EmpFileModel.fileUpload)
+                {
+                    if (fileUpload == null)
+                    {
+                        break;
+                    }
+                    else if (fileUpload.ContentLength > 20000000)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        Image image = new Image();
+
+                        Stream fileStream = fileUpload.InputStream;
+                        BinaryReader binaryReader = new BinaryReader(fileStream);
+                        byte[] FileDetail = binaryReader.ReadBytes((Int32)fileStream.Length);
+
+                        image.Content = FileDetail;
+                        image.FileName = fileUpload.FileName;
+
+                        //Save file to designated dir
+                        System.IO.Directory.CreateDirectory(Server.MapPath("~/Uploaded Files/"));
+                        string path = Server.MapPath("~/Uploaded Files/") + fileUpload.FileName;
+
+                        //Make sure duplicated files is different when stored in server folder
+                        path = GetPath(path, 1);
+                        image.ImagePath = "/Uploaded Files/" + Path.GetFileName(path);
+                        image.ProductID = ProductViewModel.Product.ID;
+
+                        var fileList = db1.Images.Where(x => x.ProductID == image.ProductID).ToList();
+                        if (fileList.FindIndex(x => x.FileName == image.FileName) < 0)
+                        {
+                            fileUpload.SaveAs(path);
+                            db1.Images.Add(image);
+                            db1.SaveChanges();
+                        }
+                        else
+                        {
+                            ViewBag.FileStatus = "Không được đăng tải file bị trùng.";
+                        }
+
+                        fileUpload.SaveAs(path);
+                    }
+                }
+            }
+
+
             return RedirectToAction("Index");
         }
 
@@ -449,13 +527,20 @@ namespace project3_ecommerce.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            Product product = db.Products.Find(id);
-
-            if (product == null)
+            Product Product = db.Products.Find(id);
+            IEnumerable<Image> images = db1.Images.Where(x => x.ProductID == Product.ID);
+            IEnumerable<Info> info = db4.Infoes.Where(x => x.ProductID == Product.ID);
+            ProductViewModel ProductViewModel = new ProductViewModel
+            {
+                Product = Product,
+                Images = images,
+                Info = info,
+            };
+            if (Product == null)
             {
                 return HttpNotFound();
             }
-            return View(product);
+            return View(ProductViewModel);
         }
 
         [HttpPost]
@@ -463,6 +548,16 @@ namespace project3_ecommerce.Controllers
         {
 
             var product = db.Products.Find(id);
+            var images = db1.Images.Where(x => x.ProductID == product.ID);
+            foreach(var item in images)
+            {
+                db1.Images.Remove(item);
+                if (System.IO.File.Exists(item.ImagePath))
+                {
+                    System.IO.File.Delete(item.ImagePath);
+                }
+            }
+            db1.SaveChanges();
             db.Products.Remove(product);
             db.SaveChanges();
             string message = "SUCCESS";
@@ -476,6 +571,335 @@ namespace project3_ecommerce.Controllers
                 db.Dispose();
             }
             base.Dispose(disposing);
+        }
+
+        // GET: Home
+        public ActionResult Charts(DateTime? currentTime)
+        {
+            if (currentTime == null)
+            {
+                DateTime currentDay = DateTime.Today;
+                currentTime = new DateTime(currentDay.Year, currentDay.Month, 1);
+            }
+
+            DateTime time = (DateTime)currentTime;
+
+/*            if (currentTime == null)
+            {
+                currentTime = DateTime.Today.Month;
+            }*/
+            Sale currentSales = db3.Sales.Where(x => x.Tháng.Month == time.Month).FirstOrDefault();
+
+            List<BarChartModel> barChartDoanhThu = new List<BarChartModel>();
+            barChartDoanhThu.Add(new BarChartModel("Máy tính", currentSales.Doanh_thu_Máy_tính));
+            barChartDoanhThu.Add(new BarChartModel("Điện thoại", currentSales.Doanh_thu_Điện_thoại));
+            barChartDoanhThu.Add(new BarChartModel("Phụ kiện", currentSales.Doanh_thu_Phụ_kiện));
+            barChartDoanhThu.Add(new BarChartModel("Khác", currentSales.Doanh_thu_Khác));
+            ViewBag.barChartDoanhThu = JsonConvert.SerializeObject(barChartDoanhThu);
+
+            List<BarChartModel> barChartSoSanPhamDaBan = new List<BarChartModel>();
+            barChartSoSanPhamDaBan.Add(new BarChartModel("Máy tính", currentSales.Số_sản_phẩm_bán_được_Máy_tính));
+            barChartSoSanPhamDaBan.Add(new BarChartModel("Điện thoại", currentSales.Số_sản_phẩm_bán_được_Điện_thoại));
+            barChartSoSanPhamDaBan.Add(new BarChartModel("Phụ kiện", currentSales.Số_sản_phẩm_bán_được_Phụ_kiện));
+            barChartSoSanPhamDaBan.Add(new BarChartModel("Khác", currentSales.Số_sản_phẩm_bán_được_Khác));
+            ViewBag.barChartSoSanPhamDaBan = JsonConvert.SerializeObject(barChartSoSanPhamDaBan);
+
+            List<BarChartModel> barChartSoSanPhamConLai = new List<BarChartModel>();
+            barChartSoSanPhamConLai.Add(new BarChartModel("Máy tính", currentSales.Số_sản_phẩm_còn_lại_Máy_tính));
+            barChartSoSanPhamConLai.Add(new BarChartModel("Điện thoại", currentSales.Số_sản_phẩm_còn_lại_Điện_thoại));
+            barChartSoSanPhamConLai.Add(new BarChartModel("Phụ kiện", currentSales.Số_sản_phẩm_còn_lại_Phụ_kiện));
+            barChartSoSanPhamConLai.Add(new BarChartModel("Khác", currentSales.Số_sản_phẩm_còn_lại_Khác));
+            ViewBag.barChartSoSanPhamConLai = JsonConvert.SerializeObject(barChartSoSanPhamConLai);
+
+            ViewBag.SelectedTime = time.ToString("MM-yyyy");
+            return View(db3.Sales.AsEnumerable());
+        }
+
+        public ActionResult LineCharts(int? year)
+        {
+            if(year == null)
+            {
+                year = DateTime.Now.Year;
+            }
+            IEnumerable<Sale> Sales = db3.Sales.Where(x => x.Tháng.Year == year).OrderBy(x=>x.Tháng.Month).AsEnumerable();
+
+            //Bieu do Doanh Thu
+            List<LineChartModel> LineChartDoanhThu1 = new List<LineChartModel>();
+            List<LineChartModel> LineChartDoanhThu2 = new List<LineChartModel>();
+            List<LineChartModel> LineChartDoanhThu3 = new List<LineChartModel>();
+            List<LineChartModel> LineChartDoanhThu4 = new List<LineChartModel>();
+
+            foreach(var sale in Sales)
+            {
+                LineChartDoanhThu1.Add(new LineChartModel(sale.Tháng.Month.ToString(), sale.Doanh_thu_Máy_tính));
+                LineChartDoanhThu2.Add(new LineChartModel(sale.Tháng.Month.ToString(), sale.Doanh_thu_Điện_thoại));
+                LineChartDoanhThu3.Add(new LineChartModel(sale.Tháng.Month.ToString(), sale.Doanh_thu_Phụ_kiện));
+                LineChartDoanhThu4.Add(new LineChartModel(sale.Tháng.Month.ToString(), sale.Doanh_thu_Khác));
+            }
+
+            ViewBag.LineChartDoanhThu1 = JsonConvert.SerializeObject(LineChartDoanhThu1);
+            ViewBag.LineChartDoanhThu2 = JsonConvert.SerializeObject(LineChartDoanhThu2);
+            ViewBag.LineChartDoanhThu3 = JsonConvert.SerializeObject(LineChartDoanhThu3);
+            ViewBag.LineChartDoanhThu4 = JsonConvert.SerializeObject(LineChartDoanhThu4);
+
+
+            //Bieu do So san pham da ban
+            List<LineChartModel> LineChartSoSanPhamDaBan1 = new List<LineChartModel>();
+            List<LineChartModel> LineChartSoSanPhamDaBan2 = new List<LineChartModel>();
+            List<LineChartModel> LineChartSoSanPhamDaBan3 = new List<LineChartModel>();
+            List<LineChartModel> LineChartSoSanPhamDaBan4 = new List<LineChartModel>();
+
+            foreach (var sale in Sales)
+            {
+                LineChartSoSanPhamDaBan1.Add(new LineChartModel(sale.Tháng.Month.ToString(), sale.Số_sản_phẩm_bán_được_Máy_tính));
+                LineChartSoSanPhamDaBan2.Add(new LineChartModel(sale.Tháng.Month.ToString(), sale.Số_sản_phẩm_bán_được_Điện_thoại));
+                LineChartSoSanPhamDaBan3.Add(new LineChartModel(sale.Tháng.Month.ToString(), sale.Số_sản_phẩm_bán_được_Phụ_kiện));
+                LineChartSoSanPhamDaBan4.Add(new LineChartModel(sale.Tháng.Month.ToString(), sale.Số_sản_phẩm_bán_được_Khác));
+            }
+
+            ViewBag.LineChartSoSanPhamDaBan1 = JsonConvert.SerializeObject(LineChartSoSanPhamDaBan1);
+            ViewBag.LineChartSoSanPhamDaBan2 = JsonConvert.SerializeObject(LineChartSoSanPhamDaBan2);
+            ViewBag.LineChartSoSanPhamDaBan3 = JsonConvert.SerializeObject(LineChartSoSanPhamDaBan3);
+            ViewBag.LineChartSoSanPhamDaBan4 = JsonConvert.SerializeObject(LineChartSoSanPhamDaBan4);
+
+
+            //Bieu do So san pham con lai
+            List<LineChartModel> LineChartSoSanPhamConLai1 = new List<LineChartModel>();
+            List<LineChartModel> LineChartSoSanPhamConLai2 = new List<LineChartModel>();
+            List<LineChartModel> LineChartSoSanPhamConLai3 = new List<LineChartModel>();
+            List<LineChartModel> LineChartSoSanPhamConLai4 = new List<LineChartModel>();
+
+            foreach(var sale in Sales)
+            {
+                LineChartSoSanPhamConLai1.Add(new LineChartModel(sale.Tháng.Month.ToString(), sale.Số_sản_phẩm_còn_lại_Máy_tính));
+                LineChartSoSanPhamConLai2.Add(new LineChartModel(sale.Tháng.Month.ToString(), sale.Số_sản_phẩm_còn_lại_Điện_thoại));
+                LineChartSoSanPhamConLai3.Add(new LineChartModel(sale.Tháng.Month.ToString(), sale.Số_sản_phẩm_còn_lại_Phụ_kiện));
+                LineChartSoSanPhamConLai4.Add(new LineChartModel(sale.Tháng.Month.ToString(), sale.Số_sản_phẩm_còn_lại_Khác));
+            }
+
+            ViewBag.LineChartSoSanPhamConLai1 = JsonConvert.SerializeObject(LineChartSoSanPhamConLai1);
+            ViewBag.LineChartSoSanPhamConLai2 = JsonConvert.SerializeObject(LineChartSoSanPhamConLai2);
+            ViewBag.LineChartSoSanPhamConLai3 = JsonConvert.SerializeObject(LineChartSoSanPhamConLai3);
+            ViewBag.LineChartSoSanPhamConLai4 = JsonConvert.SerializeObject(LineChartSoSanPhamConLai4);
+
+            ViewBag.SelectedTime = year.ToString();
+            ViewBag.CurrentYear = DateTime.Now.Year;
+            return View(Sales);
+        }
+
+        public ActionResult Edit(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            Product Product = db.Products.Find(id);
+            IEnumerable<Image> images = db1.Images.Where(x => x.ProductID == Product.ID);
+            ProductViewModel ProductViewModel = new ProductViewModel
+            {
+                Product = Product,
+                Images = images
+            };
+            if (Product == null)
+            {
+                return HttpNotFound();
+            }
+            Product.Category_EnumValue = EnumExtension.GetValueFromDescription<Category>(Product.Category);
+            var Category_EnumData = from Category e in Enum.GetValues(typeof(Category))
+                                    select new
+                                    {
+                                        ID = (int)e,
+                                        Name = e.ToDescriptionString()
+                                    };
+            ViewBag.Category_EnumList = new SelectList(Category_EnumData, "ID", "Name");
+
+            ViewBag.ProductID = ProductViewModel.Product.ID;
+            int count = 0;
+            List<long> FilesID = new List<long>();
+            foreach (var item in ProductViewModel.Images)
+            {
+                FilesID.Add(item.ID);
+                count++;
+            }
+            ViewBag.FilesID = FilesID;
+            ViewBag.IDCount = count;
+
+            return View(ProductViewModel);
+        }
+
+        [HttpPost]
+        public ActionResult Edit(ProductViewModel ProductViewModel)
+        {
+            var Category_EnumData = from Category e in Enum.GetValues(typeof(Category))
+                                    select new
+                                    {
+                                        ID = (int)e,
+                                        Name = e.ToDescriptionString()
+                                    };
+            ViewBag.Category_EnumList = new SelectList(Category_EnumData, "ID", "Name");
+
+            ProductViewModel.Product.Category = ProductViewModel.Product.Category_EnumValue.ToDescriptionString();
+
+            if (ProductViewModel.EmpFileModel.fileUpload != null)
+            {
+                foreach (HttpPostedFileBase fileUpload in ProductViewModel.EmpFileModel.fileUpload)
+                {
+                    if (fileUpload == null)
+                    {
+                        break;
+                    }
+                    else if (fileUpload.ContentLength > 20000000)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        Image image = new Image();
+
+                        Stream fileStream = fileUpload.InputStream;
+                        BinaryReader binaryReader = new BinaryReader(fileStream);
+                        byte[] FileDetail = binaryReader.ReadBytes((Int32)fileStream.Length);
+
+                        image.FileName = fileUpload.FileName;
+                        image.Content = FileDetail;
+
+                        //Save file to designated dir
+                        System.IO.Directory.CreateDirectory(Server.MapPath("~/Uploaded Files/"));
+                        string path = Server.MapPath("~/Uploaded Files/") + fileUpload.FileName;
+
+                        //Make sure duplicated files is different when stored in server folder
+                        path = GetPath(path, 1);
+                        image.ImagePath = "/Uploaded Files/" + Path.GetFileName(path);
+                        image.ProductID = ProductViewModel.Product.ID;
+
+                        var fileList = db1.Images.Where(x => x.ProductID == image.ProductID).ToList();
+                        if (fileList.FindIndex(x => x.FileName == image.FileName) < 0)
+                        {
+                            fileUpload.SaveAs(path);
+                            db1.Images.Add(image);
+                            db1.SaveChanges();
+                        }
+                        else
+                        {
+                            ViewBag.FileStatus = "Không được đăng tải file bị trùng.";
+                        }
+
+                        fileUpload.SaveAs(path);
+                    }
+                }
+            }
+
+            db.Entry(ProductViewModel.Product).State = EntityState.Modified;
+            db.SaveChanges();
+
+            ProductViewModel.Images = db1.Images.ToList().Where(x => x.ProductID == ProductViewModel.Product.ID);
+            ViewBag.ProductID = ProductViewModel.Product.ID;
+            int count = 0;
+            List<long> FilesID = new List<long>();
+            foreach (var item in ProductViewModel.Images)
+            {
+                FilesID.Add(item.ID);
+                count++;
+            }
+            ViewBag.FilesID = FilesID;
+            ViewBag.IDCount = count;
+
+            return RedirectToAction("GetList");
+        }
+
+        [HttpPost]
+        public ActionResult UploadFile(long ProductID)
+        {
+
+            HttpPostedFileBase[] fileUpload = new HttpPostedFileBase[HttpContext.Request.Files.Count];
+            List<long> FilesID = new List<long>();
+
+            for (int i = 0; i < HttpContext.Request.Files.Count; ++i)
+            {
+                fileUpload[i] = HttpContext.Request.Files[i];
+            }
+            if (fileUpload != null)
+            {
+                 foreach (HttpPostedFileBase item in fileUpload)
+                {
+                    if (item == null)
+                    {
+                        break;
+                    }
+                    else if (item.ContentLength > 20000000)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        Image image = new Image();
+
+                        Stream fileStream = item.InputStream;
+                        BinaryReader binaryReader = new BinaryReader(fileStream);
+                        byte[] FileDetail = binaryReader.ReadBytes((Int32)fileStream.Length);
+
+                        image.FileName = item.FileName;
+                        image.Content = FileDetail;
+
+                        //Save file to designated dir
+                        System.IO.Directory.CreateDirectory(Server.MapPath("~/Uploaded Files/"));
+                        string path = Server.MapPath("~/Uploaded Files/") + item.FileName;
+
+                        //Make sure duplicated files is different when stored in server folder
+                        path = GetPath(path, 1);
+                        image.ImagePath = "/Uploaded Files/" + Path.GetFileName(path);
+                        image.ProductID = ProductID;
+
+                        var fileList = db1.Images.Where(x => x.ProductID == image.ProductID).ToList();
+                        if (fileList.FindIndex(x => x.FileName == image.FileName) < 0)
+                        {
+                            item.SaveAs(path);
+                            db1.Images.Add(image);
+                            db1.SaveChanges();
+                        }
+                        else
+                        {
+                            ViewBag.FileStatus = "Không được đăng tải file bị trùng.";
+                        }
+
+                        item.SaveAs(path);
+                    }
+                }
+            }
+
+            return Json(FilesID, JsonRequestBehavior.AllowGet);
+
+        }
+        [HttpPost]
+        public ActionResult DeleteFileAjax(int FileID)
+        {
+            Image file = db1.Images.Find(FileID);
+            if (System.IO.File.Exists(file.ImagePath))
+            {
+                System.IO.File.Delete(file.ImagePath);
+            }
+            db1.Images.Remove(file);
+            db1.SaveChanges();
+
+            string message = "SUCCESS";
+            return Json(new { Message = message, JsonRequestBehavior.AllowGet });
+        }
+        [HttpGet]
+        public FileResult DownLoadFile(int id)
+        {
+            List<Image> ObjFiles = db1.Images.ToList();
+
+            var FileById = (from FC in ObjFiles
+                            where FC.ID.Equals(id)
+                            select new { FC.FileName, FC.Content }).ToList().FirstOrDefault();
+
+            return File(FileById.Content, "application/pdf", FileById.FileName);
+        }
+
+        public PartialViewResult Notifications()
+        {
+            var Messages = db5.Messages.AsEnumerable();
+            return PartialView(Messages);
         }
     }
 }

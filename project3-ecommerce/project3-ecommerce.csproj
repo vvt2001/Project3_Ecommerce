@@ -51,7 +51,25 @@
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.Core, Version=2.2.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.Core.2.2.2\lib\net45\Microsoft.AspNet.SignalR.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.SystemWeb, Version=2.2.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.SystemWeb.2.2.2\lib\net45\Microsoft.AspNet.SignalR.SystemWeb.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Owin, Version=4.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.4.0.1\lib\net45\Microsoft.Owin.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Host.SystemWeb, Version=4.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Host.SystemWeb.4.0.1\lib\net45\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security, Version=4.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Security.4.0.1\lib\net45\Microsoft.Owin.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
+      <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
+    </Reference>
     <Reference Include="PagedList, Version=1.17.0.0, Culture=neutral, PublicKeyToken=abbb863e9397c5e1, processorArchitecture=MSIL">
       <HintPath>..\packages\PagedList.1.17.0.0\lib\net40\PagedList.dll</HintPath>
     </Reference>
@@ -159,7 +177,65 @@
       <DependentUpon>AccountModel.edmx</DependentUpon>
     </Compile>
     <Compile Include="Models\CartItemModel.cs" />
+    <Compile Include="Models\BarChartModel.cs" />
+    <Compile Include="Models\ChatHub.cs" />
+    <Compile Include="Models\EmpFileModel.cs" />
     <Compile Include="Models\EnumExtension.cs" />
+    <Compile Include="Models\Image.cs">
+      <DependentUpon>ImageModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ImageModel.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ImageModel.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ImageModel.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ImageModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ImageModel.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ImageModel.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Info.cs">
+      <DependentUpon>InfoModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\InfoModel.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>InfoModel.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\InfoModel.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>InfoModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\InfoModel.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>InfoModel.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Models\LineChartModel.cs" />
+    <Compile Include="Models\Message.cs">
+      <DependentUpon>MessageModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\MessageModel.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MessageModel.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\MessageModel.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MessageModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\MessageModel.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MessageModel.edmx</DependentUpon>
+    </Compile>
     <Compile Include="Models\Product.cs">
       <DependentUpon>ProductModel.tt</DependentUpon>
     </Compile>
@@ -178,6 +254,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>ProductModel.edmx</DependentUpon>
     </Compile>
+    <Compile Include="Models\ProductViewModel.cs" />
     <Compile Include="Models\Sale.cs">
       <DependentUpon>SalesModel.tt</DependentUpon>
     </Compile>
@@ -198,6 +275,7 @@
     </Compile>
     <Compile Include="Models\SearchModel.cs" />
     <Compile Include="Models\SearchViewModel.cs" />
+    <Compile Include="Models\Startup.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -221,6 +299,36 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <DependentUpon>AccountModel.edmx</DependentUpon>
       <LastGenOutput>AccountModel.cs</LastGenOutput>
+    </Content>
+    <Content Include="Models\ImageModel.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>ImageModel.edmx</DependentUpon>
+      <LastGenOutput>ImageModel.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="Models\ImageModel.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>ImageModel.edmx</DependentUpon>
+      <LastGenOutput>ImageModel.cs</LastGenOutput>
+    </Content>
+    <Content Include="Models\InfoModel.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>InfoModel.edmx</DependentUpon>
+      <LastGenOutput>InfoModel.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="Models\InfoModel.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>InfoModel.edmx</DependentUpon>
+      <LastGenOutput>InfoModel.cs</LastGenOutput>
+    </Content>
+    <Content Include="Models\MessageModel.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>MessageModel.edmx</DependentUpon>
+      <LastGenOutput>MessageModel.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="Models\MessageModel.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>MessageModel.edmx</DependentUpon>
+      <LastGenOutput>MessageModel.cs</LastGenOutput>
     </Content>
     <Content Include="Models\ProductModel.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
@@ -267,12 +375,35 @@
     <Content Include="Models\SalesModel.edmx.diagram">
       <DependentUpon>SalesModel.edmx</DependentUpon>
     </Content>
+    <EntityDeploy Include="Models\ImageModel.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>ImageModel.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <Content Include="Models\ImageModel.edmx.diagram">
+      <DependentUpon>ImageModel.edmx</DependentUpon>
+    </Content>
+    <EntityDeploy Include="Models\InfoModel.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>InfoModel.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <Content Include="Models\InfoModel.edmx.diagram">
+      <DependentUpon>InfoModel.edmx</DependentUpon>
+    </Content>
+    <EntityDeploy Include="Models\MessageModel.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>MessageModel.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <Content Include="Models\MessageModel.edmx.diagram">
+      <DependentUpon>MessageModel.edmx</DependentUpon>
+    </Content>
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.4.1.js" />
     <Content Include="Scripts\jquery-3.4.1.min.js" />
     <Content Include="Scripts\jquery-3.4.1.slim.js" />
     <Content Include="Scripts\jquery-3.4.1.slim.min.js" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
+    <Content Include="Scripts\jquery.signalR-2.2.2.js" />
+    <Content Include="Scripts\jquery.signalR-2.2.2.min.js" />
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
@@ -306,6 +437,10 @@
     <Content Include="Views\Product\CartCheck.cshtml" />
     <Content Include="Views\Product\ConfirmPurchase.cshtml" />
     <Content Include="Views\Product\GetList.cshtml" />
+    <Content Include="Views\Product\Charts.cshtml" />
+    <Content Include="Views\Product\LineCharts.cshtml" />
+    <Content Include="Views\Product\SearchResult.cshtml" />
+    <Content Include="Views\Product\Notifications.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

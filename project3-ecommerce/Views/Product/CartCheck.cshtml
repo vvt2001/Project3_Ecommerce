@@ -7,53 +7,62 @@
         Response.Redirect("~/Account");
     }
 }
+<style>
+    body {
+        font-family: Verdana, sans-serif;
+        margin: 20px 20px 20px 20px;
+    }
+</style>
+<body>
+    <div style="margin: 20px 20px 20px 20px;">
+        <h2>Xác nhận thanh toán</h2>
 
-<h2>Xác nhận thanh toán</h2>
 
-
-@if (Model != null && Model.Count > 0)
-{
-    decimal total = 0;
-    int stt = 1;
-
-    <table class="table table-striped table-bordered">
-        <tr>
-            <th>#</th>
-            <th>Sản phẩm</th>
-            <th>Giá</th>
-            <th>Số lượng</th>
-            <th>Thành tiền</th>
-        </tr>
-        @foreach (var cartitem in Model)
+        @if (Model != null && Model.Count > 0)
         {
-            var thanhtien = cartitem.Quantity * cartitem.Product.Price;
-            total += thanhtien;
+            decimal total = 0;
+            int stt = 1;
 
-            <tr>
-                <td>@(stt++)</td>
-                <td>@cartitem.Product.Name</td>
-                <td>@(cartitem.Product.Price.ToString("n0"))</td>
-                <td>@cartitem.Quantity</td>
-                <td>@(thanhtien.ToString("n0"))</td>
-            </tr>
+            <table class="table table-striped table-bordered">
+                <tr>
+                    <th>#</th>
+                    <th>Sản phẩm</th>
+                    <th>Giá</th>
+                    <th>Số lượng</th>
+                    <th>Thành tiền</th>
+                </tr>
+                @foreach (var cartitem in Model)
+                {
+                    var thanhtien = cartitem.Quantity * cartitem.Product.Price;
+                    total += thanhtien;
+
+                    <tr>
+                        <td>@(stt++)</td>
+                        <td>@cartitem.Product.Name</td>
+                        <td>@(cartitem.Product.Price.ToString("n0"))</td>
+                        <td>@cartitem.Quantity</td>
+                        <td>@(thanhtien.ToString("n0"))</td>
+                    </tr>
+                }
+                <tr>
+                    <td colspan="4" class="text-right">Tổng tiền</td>
+                    <td>@(total.ToString("n0"))</td>
+                </tr>
+            </table>
+            <div class="text-danger" style="margin-bottom:5px">@ViewBag.OutOfStocks</div>
+            @Html.ActionLink("Xác nhận", "ConfirmPurchase", "Product", new { @class = "btn btn-success", @style = "margin-right: 10px" })
+            @Html.ActionLink("Quay lại", "Cart", "Product", new { @class = "btn btn-danger" })
+
+
         }
-        <tr>
-            <td colspan="4" class="text-right">Tổng tiền</td>
-            <td>@(total.ToString("n0"))</td>
-        </tr>
-    </table>
-    <div class="text-danger" style="margin-bottom:5px">@ViewBag.OutOfStocks</div>
-    @Html.ActionLink("Xác nhận", "ConfirmPurchase", "Product", new { @class = "btn btn-success", @style = "margin-right: 10px"})
-    @Html.ActionLink("Quay lại", "Cart", "Product", new { @class = "btn btn-danger" })
-
-
-}
-else
-{
-    <p class="alert alert-danger">Giỏ hàng trống</p>
-}
-@section Scripts {
-    <script>
+        else
+        {
+            <p class="alert alert-danger">Giỏ hàng trống</p>
+        }
+    </div>
+</body>
+    @section Scripts {
+        <script>
         var IDCount = @Html.Raw(Json.Encode(@ViewBag.IDCount));
         var CartItemsId = @Html.Raw(Json.Encode(@ViewBag.CartItemsId));
 
@@ -100,5 +109,5 @@ else
             }
             return true;
         }
-    </script>
-}
+        </script>
+    }

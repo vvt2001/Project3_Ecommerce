@@ -1,0 +1,115 @@
+﻿@model IEnumerable<project3_ecommerce.Models.Sale>
+	
+@{
+	ViewBag.Title = "Thống kê doanh thu";
+}
+
+
+	<!DOCTYPE HTML>
+	<html>
+	<head>
+	<style>
+		.chart {
+			height: 370px;
+			width: 100%;
+			margin-top: 100px;
+		}
+		.form-control {
+			width: 165px;
+			float:right;
+		}
+
+		#title {
+			text-align: center;
+			font-weight:bold;
+			margin-top: 30px;
+		}
+		body {
+			font-family: Verdana, sans-serif;
+			margin: 20px 20px 20px 20px;
+		}
+	</style>
+	<script>
+		window.onload = function () {
+
+			var chartDoanhThu = new CanvasJS.Chart("chartContainerDoanhThu", {
+				animationEnabled: true,
+				theme: "light2", // "light1", "light2", "dark1", "dark2"
+				title: {
+					text: "Tổng doanh thu"
+				},
+				axisY: {
+					title: "VND"
+				},
+				data: [{
+					type: "column",
+					dataPoints: @Html.Raw(ViewBag.barChartDoanhThu)
+				}]
+			});
+			chartDoanhThu.render();
+
+			var chartSoSanPhamDaBan = new CanvasJS.Chart("chartContainerSoSanPhamDaBan", {
+				animationEnabled: true,
+				theme: "light2", // "light1", "light2", "dark1", "dark2"
+				title: {
+					text: "Tổng số lượng sản phẩm đã bán"
+				},
+				axisY: {
+					title: "Sản phẩm"
+				},
+				data: [{
+					type: "column",
+					dataPoints: @Html.Raw(ViewBag.barChartSoSanPhamDaBan)
+				}]
+			});
+			chartSoSanPhamDaBan.render();
+
+			var chartSoSanPhamConLai = new CanvasJS.Chart("chartContainerSoSanPhamConLai", {
+				animationEnabled: true,
+				theme: "light2", // "light1", "light2", "dark1", "dark2"
+				title: {
+					text: "Số lượng sản phẩm còn lại trong kho"
+				},
+				axisY: {
+					title: "Sản phẩm"
+				},
+				data: [{
+					type: "column",
+					dataPoints: @Html.Raw(ViewBag.barChartSoSanPhamConLai)
+				}]
+			});
+			chartSoSanPhamConLai.render();
+		}
+
+		function reloadChart(value) {
+			console.log(value);
+			console.log(typeof (value));
+
+			var url = '@Url.Action("Charts", "Product", new { currentTime = "__value__" })';
+			window.location.href = url.replace('__value__', value);
+		}
+	</script>
+	</head>
+	<body>
+        <div style="margin:20px 20px 20px 20px">
+
+            <h1 id="title">Tháng @ViewBag.SelectedTime</h1>
+            <select class="form-control" id="month" onchange="reloadChart(this.value)">
+                <option value="">-Chọn thời gian-</option>
+                @foreach (var item in Model)
+                {
+                    <option value="@item.Tháng.ToString("MM/dd/yyyy")">@item.Tháng.ToString("MM-yyyy")</option>
+                }
+            </select>
+            <div id="charts">
+                <div class="chart" id="chartContainerDoanhThu"></div>
+                <div class="chart" id="chartContainerSoSanPhamDaBan"></div>
+                <div class="chart" id="chartContainerSoSanPhamConLai"></div>
+            </div>
+
+
+        </div>
+		<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+	</body>
+
+</html>
